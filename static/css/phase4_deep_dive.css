@@ -1,0 +1,330 @@
+/* Phase 4: Deep Dive — 5 Whys */
+
+/* ── Content Grid ───────────────────────────────────── */
+.deep-dive-content {
+    padding: 2rem 2rem 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+    .deep-dive-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Cause Card ─────────────────────────────────────── */
+.cause-section {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, .06);
+    border-radius: 20px;
+    padding: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .04), 0 6px 24px rgba(0, 0, 0, .04);
+    overflow: hidden;
+    transition: box-shadow .3s ease, transform .3s ease;
+}
+
+.cause-section:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .06), 0 12px 36px rgba(0, 0, 0, .08);
+    transform: translateY(-2px);
+}
+
+/* ── Header ─────────────────────────────────────────── */
+.cause-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: #FFFFFF;
+    border-bottom: 1px solid rgba(0, 0, 0, .04);
+}
+
+.cause-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1A1A1A;
+    margin: 0;
+    line-height: 1.35;
+    flex: 1;
+}
+
+.cause-badge {
+    flex-shrink: 0;
+    font-size: .6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--terracotta, #5B2D8E);
+    background: rgba(91, 45, 142, .08);
+    padding: .3rem .65rem;
+    border-radius: 6px;
+    white-space: nowrap;
+    margin-top: 2px;
+}
+
+/* ── Timeline Container ─────────────────────────────── */
+.five-whys-container {
+    padding: 1.5rem 1.75rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* ── Why Step ───────────────────────────────────────── */
+.why-step {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+}
+
+/* Timeline rail */
+.why-timeline {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 36px;
+    flex-shrink: 0;
+}
+
+.why-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .78rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+    z-index: 1;
+    transition: transform .2s, box-shadow .2s;
+}
+
+.why-step:hover .why-dot {
+    transform: scale(1.1);
+}
+
+/* Color progression */
+.why-step[data-depth="1"] .why-dot {
+    background: #E11937;
+    box-shadow: 0 2px 8px rgba(225, 25, 55, .3);
+}
+
+.why-step[data-depth="2"] .why-dot {
+    background: #C41458;
+    box-shadow: 0 2px 8px rgba(196, 20, 88, .3);
+}
+
+.why-step[data-depth="3"] .why-dot {
+    background: #5B2D8E;
+    box-shadow: 0 2px 8px rgba(91, 45, 142, .3);
+}
+
+.why-step[data-depth="4"] .why-dot {
+    background: #6B2D7B;
+    box-shadow: 0 2px 8px rgba(107, 45, 123, .3);
+}
+
+.why-step[data-depth="5"] .why-dot {
+    background: #333333;
+    box-shadow: 0 2px 8px rgba(51, 51, 51, .35);
+}
+
+.why-line {
+    width: 2px;
+    flex: 1;
+    min-height: 12px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, .1), rgba(0, 0, 0, .04));
+}
+
+/* Right content */
+.why-content {
+    flex: 1;
+    min-width: 0;
+    padding-bottom: 1.25rem;
+}
+
+.why-step:last-child .why-content {
+    padding-bottom: 0;
+}
+
+.why-label {
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: #666666;
+    margin-bottom: .4rem;
+}
+
+/* ── Input Group ────────────────────────────────────── */
+.why-input-group {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.why-input-group input,
+.why-input-group input[type="text"] {
+    flex: 1;
+    padding: .7rem 0;
+    border: none;
+    border-bottom: 2px solid rgba(0, 0, 0, .22);
+    border-radius: 0;
+    font-size: .95rem;
+    font-family: inherit;
+    background: transparent;
+    color: #333333;
+    transition: border-color .2s;
+}
+
+.why-input-group input:hover:not(:disabled) {
+    border-bottom-color: rgba(0, 0, 0, .25);
+}
+
+.why-input-group input:focus {
+    outline: none;
+    border-bottom-color: #E11937;
+    border-bottom-width: 2.5px;
+    box-shadow: 0 0 0 3px rgba(225, 25, 55, 0.1);
+    border-radius: 4px;
+}
+
+.why-input-group input:disabled {
+    border-bottom-color: rgba(0, 0, 0, .04);
+    color: rgba(0, 0, 0, .25);
+    cursor: not-allowed;
+}
+
+.why-input-group input::placeholder {
+    color: rgba(0, 0, 0, .2);
+    font-size: .9rem;
+}
+
+/* ── Tick Button ────────────────────────────────────── */
+.btn-tick {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: #1A1A1A;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all .2s;
+    flex-shrink: 0;
+}
+
+.btn-tick:hover {
+    background: #333333;
+    transform: scale(1.1);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, .18);
+}
+
+.btn-tick:active {
+    transform: scale(.92);
+}
+
+.btn-tick.hidden {
+    display: none;
+}
+
+/* ── Arrow down (legacy, hidden) ────────────────────── */
+.arrow-down {
+    display: none;
+}
+
+/* ── Footer / Submit ────────────────────────────────── */
+.deep-dive-footer {
+    padding: 1rem 2rem 2rem;
+    text-align: center;
+}
+
+.deep-dive-footer .btn {
+    padding: .75rem 2.5rem;
+    font-size: .95rem;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s ease;
+}
+
+.deep-dive-footer .btn-primary {
+    background: #E11937;
+    color: #fff;
+    box-shadow: 0 1px 3px rgba(225, 25, 55, .2);
+}
+
+.deep-dive-footer .btn-primary:hover:not(:disabled) {
+    opacity: .88;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(225, 25, 55, .2);
+}
+
+.deep-dive-footer .btn:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ── Alerts ─────────────────────────────────────────── */
+.alert {
+    padding: .875rem 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    font-size: .9rem;
+}
+
+.alert-success {
+    background: rgba(22, 163, 74, 0.06);
+    border: 1px solid rgba(22, 163, 74, 0.2);
+    color: #15803D;
+}
+
+.alert-danger {
+    background: rgba(220, 38, 38, .06);
+    border: 1px solid rgba(220, 38, 38, .15);
+    color: #dc2626;
+}
+
+.phase-tag.phase-deep-dive {
+    background-color: rgba(91, 45, 142, .12);
+    color: var(--terracotta, #5B2D8E);
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 768px) {
+    .deep-dive-content {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .cause-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .five-whys-container {
+        padding: 1.25rem;
+    }
+
+    .why-dot {
+        width: 28px;
+        height: 28px;
+        font-size: .7rem;
+    }
+
+    .why-timeline {
+        width: 28px;
+    }
+}

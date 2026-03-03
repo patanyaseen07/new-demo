@@ -1,0 +1,246 @@
+/* Shared Phase Header Styles - Consistent across all phase pages */
+
+/* Main Header Container */
+.phase-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 2rem;
+    background-color: var(--card-bg, #fff);
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* Left Section - Back button, Title, Subtitle */
+.phase-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    min-width: 280px;
+}
+
+.phase-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background-color: var(--soft-parchment, #F5F5F5);
+    color: #333333;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.phase-back-btn:hover {
+    background-color: var(--border-color, #e0e0e0);
+}
+
+.phase-header-info h1 {
+    font-size: 1.4rem;
+    color: #1A1A1A;
+    margin: 0;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.phase-header-info .phase-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted, #666666);
+    margin: 0.2rem 0 0 0;
+}
+
+/* Right Section - Timer, Actions */
+.phase-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* Timer Section */
+.phase-timer-section {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background-color: var(--soft-parchment, #F5F5F5);
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #e0e0e0);
+}
+
+.phase-timer-display {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #333333;
+}
+
+.phase-timer-display .time-value {
+    font-size: 1.15rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+}
+
+/* Live Badge */
+.phase-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.55rem;
+    background-color: #16a34a;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.phase-live-pulse {
+    width: 7px;
+    height: 7px;
+    background-color: white;
+    border-radius: 50%;
+    animation: phasePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes phasePulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(0.75);
+    }
+}
+
+/* Buttons */
+.phase-btn-add-time {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.7rem;
+    background-color: #F5F5F5;
+    color: #555555;
+    border: 1px solid #D0D0D0;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.phase-btn-add-time:hover {
+    background-color: #F5F5F5;
+}
+
+.phase-btn-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background-color: #1A1A1A;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    white-space: nowrap;
+}
+
+.phase-btn-next:hover {
+    background-color: #333333;
+}
+
+.phase-btn-next:active {
+    transform: scale(0.98);
+}
+
+.phase-btn-next svg {
+    flex-shrink: 0;
+}
+
+/* Phase Tags */
+.phase-tag-inline {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+}
+
+.phase-tag-collect {
+    background-color: #E11937;
+    color: #FFFFFF;
+}
+
+.phase-tag-vote {
+    background-color: #E11937;
+    color: #FFFFFF;
+}
+
+.phase-tag-deep-dive {
+    background-color: #E11937;
+    color: #FFFFFF;
+}
+
+.phase-tag-similar-whys {
+    background-color: #E11937;
+    color: #FFFFFF;
+}
+
+.phase-tag-result {
+    background-color: #E11937;
+    color: #FFFFFF;
+}
+
+/* Form styling */
+.phase-next-form {
+    margin: 0;
+    padding: 0;
+}
+
+/* Divider for admin controls */
+.phase-divider {
+    width: 1px;
+    height: 24px;
+    background-color: var(--border-color, #e0e0e0);
+    margin: 0 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .phase-header {
+        padding: 1rem 1.25rem;
+        gap: 1rem;
+    }
+
+    .phase-header-left {
+        min-width: 100%;
+    }
+
+    .phase-header-info h1 {
+        font-size: 1.2rem;
+    }
+
+    .phase-header-right {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}

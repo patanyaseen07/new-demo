@@ -1,0 +1,1282 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    :root {
+        /* ═══ CGI Primary ═══ */
+        --cgi-red: #E11937;
+        --cgi-black: #000000;
+        --cgi-white: #FFFFFF;
+
+        /* ═══ CGI Gradients ═══ */
+        --cgi-gradient-start: #E11937;
+        --cgi-gradient-mid: #C41458;
+        --cgi-gradient-end: #5B2D8E;
+        --cgi-orange: #F26522;
+        --cgi-soft-pink: #F8B4B8;
+
+        --cgi-gradient-header: linear-gradient(90deg, #E11937 0%, #C41458 50%, #5B2D8E 100%);
+        --cgi-gradient-warm: linear-gradient(180deg, #E11937 0%, #F26522 60%, #F8B4B8 100%);
+
+        /* ═══ Neutrals ═══ */
+        --cgi-light-grey: #F5F5F5;
+        --cgi-medium-grey: #E0E0E0;
+        --cgi-dark-text: #333333;
+        --cgi-muted-text: #666666;
+
+        /* ═══ Status ═══ */
+        --cgi-success: #2E8B57;
+        --cgi-error: #C41230;
+        --cgi-accent-purple: #6B2D7B;
+
+        /* ═══ Typography ═══ */
+        --font-heading: 'Arial', 'Helvetica Neue', sans-serif;
+        --font-body: 'Arial', 'Helvetica Neue', sans-serif;
+
+        /* ═══ Spacing ═══ */
+        --space-xs: 4px;
+        --space-sm: 8px;
+        --space-md: 16px;
+        --space-lg: 24px;
+        --space-xl: 40px;
+
+        /* ═══ Radius ═══ */
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --radius-full: 50%;
+
+        /* ═══ Shadows ═══ */
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+        --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+        --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.10), 0 4px 12px rgba(0, 0, 0, 0.06);
+        --shadow-red: 0 4px 14px rgba(225, 25, 55, 0.25);
+
+        /* ═══ Category Colors ═══ */
+        --cat-people: #E11937;
+        --cat-people-bg: #FEF2F2;
+        --cat-people-border: #FECACA;
+
+        --cat-process: #5B2D8E;
+        --cat-process-bg: #F5F3FF;
+        --cat-process-border: #DDD6FE;
+
+        --cat-tech: #2E8B57;
+        --cat-tech-bg: #ECFDF5;
+        --cat-tech-border: #A7F3D0;
+
+        --cat-tools: #F26522;
+        --cat-tools-bg: #FFF7ED;
+        --cat-tools-border: #FED7AA;
+
+        --cat-env: #6B2D7B;
+        --cat-env-bg: #FAF5FF;
+        --cat-env-border: #E9D5FF;
+
+        --cat-prog: #C41458;
+        --cat-prog-bg: #FDF2F8;
+        --cat-prog-border: #FBCFE8;
+    }
+
+    /* ═══ GLOBAL RESET ═══ */
+    .docs-wrapper,
+    .docs-wrapper *,
+    .docs-wrapper *::before,
+    .docs-wrapper *::after {
+        font-family: var(--font-body);
+        box-sizing: border-box;
+    }
+
+    .docs-wrapper {
+        background: var(--cgi-light-grey);
+        min-height: 100vh;
+    }
+
+    .docs-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 var(--space-lg) 6rem;
+    }
+
+    /* ═══ HERO SECTION ═══ */
+    .docs-hero {
+        text-align: center;
+        padding: 5rem 0 var(--space-xl);
+        position: relative;
+    }
+
+    .docs-hero::before {
+        content: '';
+        position: absolute;
+        top: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(225, 25, 55, 0.06) 0%, transparent 70%);
+        border-radius: var(--radius-full);
+        pointer-events: none;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-sm);
+        padding: var(--space-sm) 1.25rem;
+        background: var(--cgi-white);
+        border: 1px solid var(--cgi-medium-grey);
+        color: var(--cgi-muted-text);
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .hero-badge::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background: var(--cgi-red);
+        border-radius: var(--radius-full);
+    }
+
+    .docs-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--cgi-black);
+        margin-bottom: 1rem;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        font-family: var(--font-heading);
+    }
+
+    .docs-hero h1 span {
+        background: var(--cgi-gradient-header);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .docs-hero .hero-sub {
+        font-size: 1rem;
+        color: var(--cgi-muted-text);
+        max-width: 560px;
+        margin: 0 auto;
+        line-height: 1.75;
+    }
+
+    /* ═══ JOURNEY MAP ═══ */
+    .journey-map {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        padding: 1.75rem 1.5rem;
+        margin-bottom: 3.5rem;
+        background: var(--cgi-white);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        overflow-x: auto;
+        border: 1px solid var(--cgi-medium-grey);
+    }
+
+    .journey-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-sm);
+        padding: 0.75rem var(--space-sm);
+        min-width: 80px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        border-radius: var(--radius-sm);
+    }
+
+    .journey-step:hover {
+        background: #FEF2F2;
+    }
+
+    .journey-step:hover .journey-num {
+        transform: scale(1.1);
+        box-shadow: var(--shadow-red);
+    }
+
+    .journey-num {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--cgi-gradient-header);
+        color: var(--cgi-white);
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        font-weight: 800;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(225, 25, 55, 0.3);
+    }
+
+    .journey-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--cgi-muted-text);
+        text-align: center;
+        line-height: 1.3;
+        white-space: nowrap;
+    }
+
+    .journey-line {
+        width: 28px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--cgi-red), rgba(225, 25, 55, 0.2));
+        flex-shrink: 0;
+        margin-top: -1rem;
+    }
+
+    /* ═══ PHASE SECTIONS ═══ */
+    .phase {
+        margin-bottom: 1.75rem;
+    }
+
+    .phase-card {
+        background: var(--cgi-white);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--cgi-medium-grey);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .phase-card:hover {
+        box-shadow: var(--shadow-lg);
+        border-color: rgba(225, 25, 55, 0.15);
+    }
+
+    /* Phase Header — CGI Gradient Top Bar */
+    .phase-topbar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem 1.75rem;
+        background: linear-gradient(135deg, rgba(225, 25, 55, 0.03) 0%, rgba(91, 45, 142, 0.02) 100%);
+        border-bottom: 1px solid var(--cgi-medium-grey);
+    }
+
+    .phase-icon {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--cgi-gradient-header);
+        color: var(--cgi-white);
+        border-radius: var(--radius-sm);
+        font-weight: 800;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+        box-shadow: var(--shadow-red);
+    }
+
+    .phase-meta {
+        flex: 1;
+    }
+
+    .phase-tag {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--cgi-red);
+        margin-bottom: 0.15rem;
+    }
+
+    .phase-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--cgi-black);
+        margin: 0;
+        letter-spacing: -0.01em;
+        font-family: var(--font-heading);
+    }
+
+    /* Phase Body */
+    .phase-body {
+        padding: 1.75rem;
+    }
+
+    .phase-desc {
+        font-size: 0.95rem;
+        line-height: 1.8;
+        color: var(--cgi-dark-text);
+        margin-bottom: 1.5rem;
+    }
+
+    .phase-desc strong {
+        color: var(--cgi-black);
+        font-weight: 700;
+    }
+
+    /* ═══ FEATURE GRID ═══ */
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    .feature {
+        padding: 1.25rem;
+        border-radius: var(--radius-md);
+        background: var(--cgi-light-grey);
+        border: 1px solid var(--cgi-medium-grey);
+        transition: all 0.3s ease;
+    }
+
+    .feature:hover {
+        border-color: var(--cgi-red);
+        background: #FEF2F2;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .feature-icon {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--cgi-white);
+        border: 1px solid var(--cgi-medium-grey);
+        border-radius: var(--radius-sm);
+        font-size: 1.1rem;
+        margin-bottom: 0.85rem;
+    }
+
+    .feature:hover .feature-icon {
+        background: var(--cgi-white);
+        border-color: var(--cgi-red);
+    }
+
+    .feature-title {
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: var(--cgi-black);
+        margin-bottom: 0.35rem;
+    }
+
+    .feature-desc {
+        font-size: 0.82rem;
+        color: var(--cgi-muted-text);
+        line-height: 1.55;
+    }
+
+    /* ═══ CATEGORIES ═══ */
+    .categories {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.6rem;
+        margin: 1.5rem 0;
+    }
+
+    .cat {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.7rem 1rem;
+        border-radius: var(--radius-sm);
+        font-weight: 700;
+        font-size: 0.82rem;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+    }
+
+    .cat:hover {
+        transform: translateX(4px);
+    }
+
+    .cat-icon {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        font-size: 0.85rem;
+    }
+
+    .cat.people { background: var(--cat-people-bg); color: var(--cat-people); border-color: var(--cat-people-border); }
+    .cat.people .cat-icon { background: var(--cat-people-border); }
+    .cat.process { background: var(--cat-process-bg); color: var(--cat-process); border-color: var(--cat-process-border); }
+    .cat.process .cat-icon { background: var(--cat-process-border); }
+    .cat.tech { background: var(--cat-tech-bg); color: var(--cat-tech); border-color: var(--cat-tech-border); }
+    .cat.tech .cat-icon { background: var(--cat-tech-border); }
+    .cat.tools { background: var(--cat-tools-bg); color: var(--cat-tools); border-color: var(--cat-tools-border); }
+    .cat.tools .cat-icon { background: var(--cat-tools-border); }
+    .cat.env { background: var(--cat-env-bg); color: var(--cat-env); border-color: var(--cat-env-border); }
+    .cat.env .cat-icon { background: var(--cat-env-border); }
+    .cat.prog { background: var(--cat-prog-bg); color: var(--cat-prog); border-color: var(--cat-prog-border); }
+    .cat.prog .cat-icon { background: var(--cat-prog-border); }
+
+    /* ═══ ALERTS ═══ */
+    .alert-box {
+        display: flex;
+        gap: 0.85rem;
+        padding: 1.1rem 1.35rem;
+        border-radius: var(--radius-sm);
+        margin: 1.5rem 0;
+        font-size: 0.88rem;
+        line-height: 1.65;
+        align-items: flex-start;
+    }
+
+    .alert-box .alert-icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .alert-box.warn {
+        background: #FFF7ED;
+        border: 1px solid var(--cat-tools-border);
+        color: #9A3412;
+    }
+    .alert-box.warn .alert-icon { background: var(--cat-tools-border); }
+
+    .alert-box.tip {
+        background: var(--cat-process-bg);
+        border: 1px solid var(--cat-process-border);
+        color: var(--cgi-accent-purple);
+    }
+    .alert-box.tip .alert-icon { background: var(--cat-process-border); }
+
+    .alert-box.done {
+        background: var(--cat-tech-bg);
+        border: 1px solid var(--cat-tech-border);
+        color: #065F46;
+    }
+    .alert-box.done .alert-icon { background: var(--cat-tech-border); }
+
+    .alert-box strong {
+        display: block;
+        margin-bottom: 0.15rem;
+        color: inherit;
+    }
+
+    /* ═══ EXAMPLE BOX ═══ */
+    .example {
+        background: var(--cgi-light-grey);
+        border-radius: var(--radius-md);
+        padding: 1.75rem;
+        margin: 1.5rem 0;
+        border: 1px solid var(--cgi-medium-grey);
+        position: relative;
+    }
+
+    .example::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--cgi-gradient-header);
+        border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    }
+
+    .example-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--cgi-red);
+        margin-bottom: 1rem;
+    }
+
+    .example-problem {
+        font-weight: 700;
+        color: var(--cgi-black);
+        font-size: 0.98rem;
+        margin-bottom: 1.25rem;
+        line-height: 1.5;
+        font-family: var(--font-heading);
+    }
+
+    /* ═══ WHY CHAIN ═══ */
+    .chain {
+        margin: 1.25rem 0;
+    }
+
+    .chain-label {
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: var(--cgi-black);
+        margin-bottom: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .chain-label .chain-cat {
+        font-size: 0.68rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: var(--radius-sm);
+        font-weight: 700;
+    }
+
+    .chain-label .chain-cat.tools-cat { background: var(--cat-tools-bg); color: var(--cat-tools); }
+    .chain-label .chain-cat.people-cat { background: var(--cat-people-bg); color: var(--cat-people); }
+
+    .why-row {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        padding: 0.55rem 0;
+    }
+
+    .why-badge {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--cgi-gradient-header);
+        color: var(--cgi-white);
+        border-radius: var(--radius-sm);
+        font-size: 0.65rem;
+        font-weight: 800;
+        flex-shrink: 0;
+        box-shadow: 0 2px 6px rgba(225, 25, 55, 0.25);
+    }
+
+    .why-answer {
+        font-size: 0.9rem;
+        color: var(--cgi-dark-text);
+        line-height: 1.5;
+    }
+
+    .why-arrow {
+        display: flex;
+        justify-content: flex-start;
+        padding-left: 11px;
+        height: 16px;
+    }
+
+    .why-arrow::after {
+        content: '';
+        display: block;
+        width: 2px;
+        height: 100%;
+        background: var(--cgi-red);
+        opacity: 0.2;
+        border-radius: 1px;
+    }
+
+    /* ═══ REFINEMENT BLOCK ═══ */
+    .refine-block {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin: 1.25rem 0;
+    }
+
+    .refine-item {
+        padding: 1rem 1.25rem;
+        border-radius: var(--radius-md);
+    }
+
+    .refine-item.before {
+        background: var(--cat-people-bg);
+        border: 1px solid var(--cat-people-border);
+    }
+
+    .refine-item.after {
+        background: var(--cat-tech-bg);
+        border: 1px solid var(--cat-tech-border);
+    }
+
+    .refine-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.4rem;
+    }
+
+    .refine-item.before .refine-label { color: var(--cat-people); }
+    .refine-item.after .refine-label { color: var(--cgi-success); }
+
+    .refine-text {
+        font-size: 0.92rem;
+        color: var(--cgi-black);
+        font-weight: 700;
+        line-height: 1.5;
+    }
+
+    .refine-arrow {
+        display: flex;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: var(--cgi-red);
+    }
+
+    /* ═══ CONNECTOR ═══ */
+    .connector {
+        display: flex;
+        justify-content: center;
+        padding: 0.2rem 0;
+    }
+
+    .connector-line {
+        width: 3px;
+        height: 28px;
+        background: linear-gradient(to bottom, var(--cgi-red), transparent);
+        border-radius: 2px;
+    }
+
+    /* ═══ FOOTER ═══ */
+    .docs-footer {
+        text-align: center;
+        padding: 3rem 0 1rem;
+        margin-top: 2rem;
+        border-top: 1px solid var(--cgi-medium-grey);
+    }
+
+    .docs-footer p {
+        font-size: 0.85rem;
+        color: var(--cgi-muted-text);
+        line-height: 1.65;
+    }
+
+    .docs-footer .internal-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: var(--cgi-light-grey);
+        border: 1px solid var(--cgi-medium-grey);
+        border-radius: var(--radius-sm);
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: var(--cgi-muted-text);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 1rem;
+    }
+
+    /* ═══ RESPONSIVE ═══ */
+    @media (max-width: 768px) {
+        .docs-hero h1 {
+            font-size: 2rem;
+        }
+
+        .categories {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .journey-map {
+            justify-content: flex-start;
+            padding: 1.25rem 1rem;
+        }
+
+        .journey-line {
+            width: 16px;
+        }
+
+        .journey-step {
+            min-width: 60px;
+            padding: 0.5rem 0.25rem;
+        }
+
+        .journey-label {
+            font-size: 0.6rem;
+        }
+
+        .phase-topbar {
+            padding: 1rem 1.25rem;
+        }
+
+        .phase-body {
+            padding: 1.25rem;
+        }
+
+        .features {
+            grid-template-columns: 1fr;
+        }
+
+        .phase-name {
+            font-size: 1.1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .categories {
+            grid-template-columns: 1fr;
+        }
+
+        .journey-map {
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        .journey-line {
+            display: none;
+        }
+    }
+</style>
+
+<div class="docs-wrapper">
+    <div class="docs-container">
+
+        <!-- HERO -->
+        <header class="docs-hero">
+            <div class="hero-badge">Documentation</div>
+            <h1>How <span>FishboneRCA</span> Works</h1>
+            <p class="hero-sub">
+                A structured, AI-powered approach to Root Cause Analysis — from identifying problems
+                to actionable solutions, all through team collaboration.
+            </p>
+        </header>
+
+        <!-- JOURNEY MAP -->
+        <nav class="journey-map">
+            <a href="#draft" class="journey-step">
+                <div class="journey-num">D</div>
+                <div class="journey-label">Draft</div>
+            </a>
+            <div class="journey-line"></div>
+            <a href="#phase1" class="journey-step">
+                <div class="journey-num">1</div>
+                <div class="journey-label">Collect</div>
+            </a>
+            <div class="journey-line"></div>
+            <a href="#phase2" class="journey-step">
+                <div class="journey-num">2</div>
+                <div class="journey-label">Fishbone</div>
+            </a>
+            <div class="journey-line"></div>
+            <a href="#phase3" class="journey-step">
+                <div class="journey-num">3</div>
+                <div class="journey-label">Vote</div>
+            </a>
+            <div class="journey-line"></div>
+            <a href="#phase4" class="journey-step">
+                <div class="journey-num">4</div>
+                <div class="journey-label">5 Whys</div>
+            </a>
+            <div class="journey-line"></div>
+            <a href="#phase5" class="journey-step">
+                <div class="journey-num">5</div>
+                <div class="journey-label">Similar</div>
+            </a>
+            <div class="journey-line"></div>
+            <a href="#phase6" class="journey-step">
+                <div class="journey-num">6</div>
+                <div class="journey-label">Refine</div>
+            </a>
+            <div class="journey-line"></div>
+            <a href="#phase7" class="journey-step">
+                <div class="journey-num">7</div>
+                <div class="journey-label">Ideas</div>
+            </a>
+            <div class="journey-line"></div>
+            <a href="#phase8" class="journey-step">
+                <div class="journey-num">8</div>
+                <div class="journey-label">Results</div>
+            </a>
+        </nav>
+
+        <!-- DRAFT PHASE -->
+        <section class="phase" id="draft">
+            <div class="phase-card">
+                <div class="phase-topbar">
+                    <div class="phase-icon">D</div>
+                    <div class="phase-meta">
+                        <div class="phase-tag">Setup</div>
+                        <h2 class="phase-name">Draft — Create Problem Statement</h2>
+                    </div>
+                </div>
+                <div class="phase-body">
+                    <p class="phase-desc">
+                        The <strong>Administrator</strong> kicks off the RCA session by creating a clear, specific
+                        problem statement. This is the foundation for the entire analysis — a well-defined problem
+                        leads to better root causes and stronger solutions.
+                    </p>
+                    <div class="features">
+                        <div class="feature">
+                            <div class="feature-icon">🎯</div>
+                            <div class="feature-title">Define the Problem</div>
+                            <div class="feature-desc">Write a clear, specific problem that the team will investigate together.</div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">👥</div>
+                            <div class="feature-title">Invite Participants</div>
+                            <div class="feature-desc">Team members join the session and wait for it to go live.</div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">⏱️</div>
+                            <div class="feature-title">Configure Timers</div>
+                            <div class="feature-desc">Set time limits for each phase to keep the session focused.</div>
+                        </div>
+                    </div>
+                    <div class="example">
+                        <div class="example-tag">📌 Example Problem</div>
+                        <div class="example-problem">
+                            "Project delays are causing significant business loss and missed revenue targets."
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="connector"><div class="connector-line"></div></div>
+
+        <!-- PHASE 1 -->
+        <section class="phase" id="phase1">
+            <div class="phase-card">
+                <div class="phase-topbar">
+                    <div class="phase-icon">1</div>
+                    <div class="phase-meta">
+                        <div class="phase-tag">Phase 1 — Collection</div>
+                        <h2 class="phase-name">Submit Root Causes</h2>
+                    </div>
+                </div>
+                <div class="phase-body">
+                    <p class="phase-desc">
+                        The session goes <strong>LIVE</strong> when the admin starts it. All participants
+                        independently submit potential causes for the problem. An <strong>AI-powered LLM</strong>
+                        automatically categorizes each cause into the appropriate Fishbone category.
+                    </p>
+
+                    <div class="categories">
+                        <div class="cat people"><span class="cat-icon">👤</span> People</div>
+                        <div class="cat process"><span class="cat-icon">⚙️</span> Process</div>
+                        <div class="cat tech"><span class="cat-icon">💻</span> Technology</div>
+                        <div class="cat tools"><span class="cat-icon">🔧</span> Tools</div>
+                        <div class="cat env"><span class="cat-icon">🌍</span> Environment</div>
+                        <div class="cat prog"><span class="cat-icon">📋</span> Program</div>
+                    </div>
+
+                    <div class="features">
+                        <div class="feature">
+                            <div class="feature-icon">🤖</div>
+                            <div class="feature-title">AI Categorization</div>
+                            <div class="feature-desc">Each cause is automatically classified into one of 6 Fishbone categories.</div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">✍️</div>
+                            <div class="feature-title">Auto-Normalization</div>
+                            <div class="feature-desc">Spelling and grammar errors are corrected automatically for clarity.</div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">🛡️</div>
+                            <div class="feature-title">Smart Validation</div>
+                            <div class="feature-desc">Gibberish, random text, and irrelevant input are automatically rejected.</div>
+                        </div>
+                    </div>
+
+                    <div class="alert-box warn">
+                        <div class="alert-icon">⚠️</div>
+                        <div>
+                            <strong>Submit meaningful causes only.</strong>
+                            The AI validates every submission. Irrelevant text, random characters,
+                            personal opinions (e.g., "I don't like this"), and gibberish will be rejected.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="connector"><div class="connector-line"></div></div>
+
+        <!-- PHASE 2 -->
+        <section class="phase" id="phase2">
+            <div class="phase-card">
+                <div class="phase-topbar">
+                    <div class="phase-icon">2</div>
+                    <div class="phase-meta">
+                        <div class="phase-tag">Phase 2 — Visualization</div>
+                        <h2 class="phase-name">Fishbone Diagram</h2>
+                    </div>
+                </div>
+                <div class="phase-body">
+                    <p class="phase-desc">
+                        All collected causes are displayed in an interactive <strong>Fishbone (Ishikawa) diagram</strong>.
+                        The AI automatically identifies and removes <strong>duplicate or similar causes</strong>,
+                        giving the team a clean, organized view of all unique root causes by category.
+                    </p>
+                    <div class="features">
+                        <div class="feature">
+                            <div class="feature-icon">🔀</div>
+                            <div class="feature-title">Duplicate Removal</div>
+                            <div class="feature-desc">AI merges semantically similar causes to eliminate redundancy.</div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">📊</div>
+                            <div class="feature-title">Interactive Diagram</div>
+                            <div class="feature-desc">Causes organized in the classic Fishbone structure for clear visualization.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="connector"><div class="connector-line"></div></div>
+
+        <!-- PHASE 3 -->
+        <section class="phase" id="phase3">
+            <div class="phase-card">
+                <div class="phase-topbar">
+                    <div class="phase-icon">3</div>
+                    <div class="phase-meta">
+                        <div class="phase-tag">Phase 3 — Consensus</div>
+                        <h2 class="phase-name">Vote on Root Causes</h2>
+                    </div>
+                </div>
+                <div class="phase-body">
+                    <p class="phase-desc">
+                        Participants vote on the causes they believe have the <strong>most impact</strong>
+                        on the problem. Each user gets exactly <strong>3 votes</strong>. After voting closes,
+                        causes are ranked and the <strong>top 2</strong> advance to deep-dive analysis.
+                    </p>
+                    <div class="features">
+                        <div class="feature">
+                            <div class="feature-icon">🗳️</div>
+                            <div class="feature-title">3 Votes Per Person</div>
+                            <div class="feature-desc">Each participant selects the 3 causes they feel are most critical.</div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">📈</div>
+                            <div class="feature-title">Prioritized Results</div>
+                            <div class="feature-desc">Causes ranked by vote count. The top 2 move to 5 Whys analysis.</div>
+                        </div>
+                    </div>
+                    <div class="alert-box tip">
+                        <div class="alert-icon">💡</div>
+                        <div>
+                            <strong>Tip:</strong>
+                            Vote for causes with the biggest impact on the problem,
+                            not just the ones you personally relate to. Think about the bigger picture.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="connector"><div class="connector-line"></div></div>
+
+        <!-- PHASE 4 -->
+        <section class="phase" id="phase4">
+            <div class="phase-card">
+                <div class="phase-topbar">
+                    <div class="phase-icon">4</div>
+                    <div class="phase-meta">
+                        <div class="phase-tag">Phase 4 — Deep Dive</div>
+                        <h2 class="phase-name">5 Whys Analysis</h2>
+                    </div>
+                </div>
+                <div class="phase-body">
+                    <p class="phase-desc">
+                        The <strong>top 2 voted causes</strong> undergo a 5 Whys deep-dive. Each participant
+                        answers 5 progressive "Why?" questions for <strong>both causes</strong> — drilling
+                        down from the surface cause to the true root cause.
+                    </p>
+
+                    <div class="example">
+                        <div class="example-tag">📌 Example — 5 Whys in Action</div>
+                        <div class="example-problem">Problem: "Project delays causing significant business loss"</div>
+
+                        <div class="chain">
+                            <div class="chain-label">
+                                Cause 1:
+                                <span class="chain-cat tools-cat">🔧 Tools</span>
+                                Outdated tools hindering project efficiency
+                            </div>
+                            <div class="why-row">
+                                <span class="why-badge">W1</span>
+                                <span class="why-answer">Tools are outdated and slow</span>
+                            </div>
+                            <div class="why-arrow"></div>
+                            <div class="why-row">
+                                <span class="why-badge">W2</span>
+                                <span class="why-answer">Tools haven't been upgraded in years</span>
+                            </div>
+                            <div class="why-arrow"></div>
+                            <div class="why-row">
+                                <span class="why-badge">W3</span>
+                                <span class="why-answer">Budget allocation was prioritized elsewhere</span>
+                            </div>
+                            <div class="why-arrow"></div>
+                            <div class="why-row">
+                                <span class="why-badge">W4</span>
+                                <span class="why-answer">Leadership assumed tools were "good enough"</span>
+                            </div>
+                            <div class="why-arrow"></div>
+                            <div class="why-row">
+                                <span class="why-badge">W5</span>
+                                <span class="why-answer">No feedback mechanism for tool performance</span>
+                            </div>
+                        </div>
+
+                        <hr style="border: none; border-top: 1px solid var(--cgi-medium-grey); margin: 1.5rem 0;">
+
+                        <div class="chain">
+                            <div class="chain-label">
+                                Cause 2:
+                                <span class="chain-cat people-cat">👤 People</span>
+                                Team members struggling with task complexity
+                            </div>
+                            <div class="why-row">
+                                <span class="why-badge">W1</span>
+                                <span class="why-answer">Lacking technical skills and domain knowledge</span>
+                            </div>
+                            <div class="why-arrow"></div>
+                            <div class="why-row">
+                                <span class="why-badge">W2</span>
+                                <span class="why-answer">Training programs are insufficient and outdated</span>
+                            </div>
+                            <div class="why-arrow"></div>
+                            <div class="why-row">
+                                <span class="why-badge">W3</span>
+                                <span class="why-answer">Limited investment in continuous learning</span>
+                            </div>
+                            <div class="why-arrow"></div>
+                            <div class="why-row">
+                                <span class="why-badge">W4</span>
+                                <span class="why-answer">Management focuses on short-term delivery</span>
+                            </div>
+                            <div class="why-arrow"></div>
+                            <div class="why-row">
+                                <span class="why-badge">W5</span>
+                                <span class="why-answer">Pressure from clients and stakeholders to meet deadlines</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert-box warn">
+                        <div class="alert-icon">⚠️</div>
+                        <div>
+                            <strong>All 5 Whys required for both causes.</strong>
+                            You must answer all 10 questions (5 per cause). The Submit button
+                            unlocks only when every answer is filled in.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="connector"><div class="connector-line"></div></div>
+
+        <!-- PHASE 5 -->
+        <section class="phase" id="phase5">
+            <div class="phase-card">
+                <div class="phase-topbar">
+                    <div class="phase-icon">5</div>
+                    <div class="phase-meta">
+                        <div class="phase-tag">Phase 5 — Consolidation</div>
+                        <h2 class="phase-name">Similar Whys — Identify Patterns</h2>
+                    </div>
+                </div>
+                <div class="phase-body">
+                    <p class="phase-desc">
+                        The AI analyzes <strong>all "Why" answers across all participants</strong> and groups
+                        semantically similar responses together. The <strong>top 10 recurring themes</strong>
+                        are surfaced. Participants then vote on the one they believe is the
+                        <strong>most fundamental root cause</strong>.
+                    </p>
+                    <div class="features">
+                        <div class="feature">
+                            <div class="feature-icon">🔍</div>
+                            <div class="feature-title">AI Pattern Detection</div>
+                            <div class="feature-desc">Similar answers from different participants are grouped into common themes.</div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">🏆</div>
+                            <div class="feature-title">Top 10 Themes</div>
+                            <div class="feature-desc">The most recurring root cause patterns are presented for final voting.</div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">🗳️</div>
+                            <div class="feature-title">Vote on Root Cause</div>
+                            <div class="feature-desc">Participants vote on the theme they believe is the true root cause.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="connector"><div class="connector-line"></div></div>
+
+        <!-- PHASE 6 -->
+        <section class="phase" id="phase6">
+            <div class="phase-card">
+                <div class="phase-topbar">
+                    <div class="phase-icon">6</div>
+                    <div class="phase-meta">
+                        <div class="phase-tag">Phase 6 — Refinement</div>
+                        <h2 class="phase-name">Refined Problem Statement</h2>
+                    </div>
+                </div>
+                <div class="phase-body">
+                    <p class="phase-desc">
+                        The <strong>most voted "Why" theme</strong> is refined by AI into a clear, actionable
+                        <strong>new problem statement</strong>. This connects the root cause back to the
+                        original problem — giving the team a precise target for the solution phase.
+                    </p>
+
+                    <div class="example">
+                        <div class="example-tag">📌 Example Refinement</div>
+                        <div class="refine-block">
+                            <div class="refine-item before">
+                                <div class="refine-label">Top Voted Why</div>
+                                <div class="refine-text">"Management prioritizes short-term delivery over long-term investment"</div>
+                            </div>
+                            <div class="refine-arrow">↓</div>
+                            <div class="refine-item after">
+                                <div class="refine-label">Refined Problem Statement</div>
+                                <div class="refine-text">
+                                    "Project delays persist because management prioritizes short-term delivery,
+                                    neglecting tool upgrades and team skill development."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="connector"><div class="connector-line"></div></div>
+
+        <!-- PHASE 7 -->
+        <section class="phase" id="phase7">
+            <div class="phase-card">
+                <div class="phase-topbar">
+                    <div class="phase-icon">7</div>
+                    <div class="phase-meta">
+                        <div class="phase-tag">Phase 7 — Solutions</div>
+                        <h2 class="phase-name">Submit & Vote on Ideas</h2>
+                    </div>
+                </div>
+                <div class="phase-body">
+                    <p class="phase-desc">
+                        With a clear root cause identified, participants now submit
+                        <strong>actionable ideas and solutions</strong> to address the refined problem.
+                        Each idea is validated by AI, then the team votes on the most effective solutions.
+                    </p>
+                    <div class="features">
+                        <div class="feature">
+                            <div class="feature-icon">💡</div>
+                            <div class="feature-title">Submit Ideas</div>
+                            <div class="feature-desc">Propose actionable solutions that directly address the refined problem.</div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">🗳️</div>
+                            <div class="feature-title">Vote on Impact</div>
+                            <div class="feature-desc">Participants vote on the ideas they believe will be most effective.</div>
+                        </div>
+                    </div>
+                    <div class="alert-box warn">
+                        <div class="alert-icon">⚠️</div>
+                        <div>
+                            <strong>Submit solutions, not complaints.</strong>
+                            The AI rejects non-actionable inputs like "I don't like this" or random text.
+                            Focus on what can be done to fix the problem.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="connector"><div class="connector-line"></div></div>
+
+        <!-- PHASE 8 -->
+        <section class="phase" id="phase8">
+            <div class="phase-card">
+                <div class="phase-topbar">
+                    <div class="phase-icon">8</div>
+                    <div class="phase-meta">
+                        <div class="phase-tag">Phase 8 — Outcome</div>
+                        <h2 class="phase-name">Final Results & Action Plan</h2>
+                    </div>
+                </div>
+                <div class="phase-body">
+                    <p class="phase-desc">
+                        The final phase presents the complete outcome. The <strong>top 3 most voted ideas</strong>
+                        are highlighted as priority actions, followed by a complete ranked list of all ideas
+                        submitted during the session.
+                    </p>
+                    <div class="features">
+                        <div class="feature">
+                            <div class="feature-icon">🥇</div>
+                            <div class="feature-title">Top 3 Priority Actions</div>
+                            <div class="feature-desc">The three highest-voted solutions are highlighted as immediate action items.</div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon">📋</div>
+                            <div class="feature-title">Complete Ranked List</div>
+                            <div class="feature-desc">All submitted ideas ranked by votes for future reference and planning.</div>
+                        </div>
+                    </div>
+                    <div class="alert-box done">
+                        <div class="alert-icon">✅</div>
+                        <div>
+                            <strong>Session Complete!</strong>
+                            The team now has a clear root cause, a refined problem statement,
+                            and prioritized action items ready for implementation.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="docs-footer">
+            <p>
+                FishboneRCA combines the proven Ishikawa methodology with AI-powered analysis
+                to transform how teams identify and solve problems together.
+            </p>
+            <div class="internal-badge">Internal</div>
+        </footer>
+
+    </div>
+</div>
+
+<script>
+    // Smooth scroll
+    document.querySelectorAll('.journey-step').forEach(step => {
+        step.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = document.querySelector(step.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // Scroll animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.phase').forEach(phase => {
+        phase.style.opacity = '0';
+        phase.style.transform = 'translateY(30px)';
+        phase.style.transition = 'all 0.6s ease';
+        observer.observe(phase);
+    });
+</script>
+{% endblock %}

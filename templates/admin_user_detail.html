@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ target_user.email }} — Admin{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+
+<div class="admin-container">
+
+    <!-- Header -->
+    <header class="admin-header">
+        <div>
+            <div class="admin-breadcrumb">
+                <a href="{{ url_for('dashboard') }}" class="breadcrumb-link">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 5l-7 7 7 7"></path>
+                    </svg>
+                    Dashboard
+                </a>
+                <span class="breadcrumb-sep">/</span>
+                <a href="{{ url_for('admin_panel') }}" class="breadcrumb-link">Admin Panel</a>
+                <span class="breadcrumb-sep">/</span>
+                <a href="{{ url_for('admin_table_view', table_name='users') }}" class="breadcrumb-link">Users</a>
+            </div>
+            <h1>User Participation</h1>
+            <p>Detailed activity across all problem sessions</p>
+        </div>
+        <div style="display:flex; gap:0.75rem; align-items:center;">
+            <!-- Delete user -->
+            <form method="POST"
+                  action="{{ url_for('admin_delete_record', table_name='users', record_id=target_user.id) }}"
+                  onsubmit="return confirm('Delete user {{ target_user.email }}? This removes the user account but NOT their submitted content.')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="page" value="1">
+                <button type="submit" class="btn-danger-sm">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                    </svg>
+                    Delete User
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <!-- User Info Card -->
+    <div class="user-info-card">
+        <div class="user-avatar">{{ target_user.email[0]|upper }}</div>
+        <div style="flex:1; min-width:0;">
+            <div class="user-email">{{ target_user.email }}</div>
+            <div class="user-meta">
+                <span class="role-badge {{ target_user.role }}">{{ 'Administrator' if target_user.role == 'admin' else 'Team Lead' if target_user.role == 'team_lead' else 'Business Analyst' if target_user.role == 'business_analyst' else 'Member' }}</span>
+                <span>Joined {{ target_user.created_at }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="summary-stats">
+        <div class="summary-stat">
+            <div class="s-value">{{ summary.problems_count }}</div>
+            <div class="s-label">Problems</div>
+        </div>
+        <div class="summary-stat">
+            <div class="s-value">{{ summary.feedback_count }}</div>
+            <div class="s-label">Feedback</div>
+        </div>
+        <div class="summary-stat">
+            <div class="s-value">{{ summary.vote_count }}</div>
+            <div class="s-label">Votes</div>
+        </div>
+        <div class="summary-stat">
+            <div class="s-value">{{ summary.why_count }}</div>
+            <div class="s-label">Root Cause Steps</div>
+        </div>
+        <div class="summary-stat">
+            <div class="s-value">{{ summary.similar_vote_count }}</div>
+            <div class="s-label">Root Cause Votes</div>
+        </div>
+        <div class="summary-stat">
+            <div class="s-value">{{ summary.idea_count }}</div>
+            <div class="s-label">Ideas</div>
+        </div>
+    </div>
+
+    <!-- Per-Problem Participation -->
+    <section class="admin-section">
+        <h2>Participation by Problem</h2>
+
+        {% if participation %}
+            {% for entry in participation %}
+            <div class="problem-participation">
+
+                <!-- Collapsible Header -->
+                <div class="pp-header" onclick="togglePP(this)">
+                    <div class="pp-header-left">
+                        <div>
+                            <div class="pp-title">{{ entry.problem_title }}</div>
+                            <div style="margin-top:0.3rem; display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                                <span class="phase-badge">{{ entry.problem_phase | phase_display }}</span>
+                                <a href="{{ url_for('admin_problem_detail', problem_id=entry.problem_id) }}"
+                                   onclick="event.stopPropagation();"
+                                   class="pp-view-link" title="Open problem detail">
+                                    View details →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pp-header-right">
+                        <div class="stat-chips">
+                            {% if entry.feedback %}
+                            <span class="stat-chip"><strong>{{ entry.feedback|length }}</strong> feedback</span>
+                            {% endif %}
+                            {% if entry.votes %}
+                            <span class="stat-chip"><strong>{{ entry.votes|length }}</strong> votes</span>
+                            {% endif %}
+                            {% if entry.five_whys_count %}
+                            <span class="stat-chip"><strong>{{ entry.five_whys_count }}</strong> whys</span>
+                            {% endif %}
+                            {% if entry.ideas %}
+                            <span class="stat-chip"><strong>{{ entry.ideas|length }}</strong> ideas</span>
+                            {% endif %}
+                        </div>
+                        <svg class="pp-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Collapsible Body -->
+                <div class="pp-body">
+                    <div class="pp-sections">
+
+                        <!-- Feedback -->
+                        <div class="pp-section">
+                            <h4>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:4px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                Feedback Submitted ({{ entry.feedback|length }})
+                            </h4>
+                            {% if entry.feedback %}
+                                {% for f in entry.feedback %}
+                                <div class="activity-item activity-item-deletable">
+                                    <div class="activity-item-body">
+                                        <div class="activity-content">{{ f.content }}</div>
+                                        <div class="activity-meta">
+                                            {% if f.normalized and f.normalized != f.content %}
+                                            <span title="AI-cleaned version of the submitted text">Cleaned up: {{ f.normalized }}</span>
+                                            {% endif %}
+                                            {% if f.category %}
+                                            <span class="activity-tag">{{ f.category }}</span>
+                                            {% endif %}
+                                            <span>{{ f.submitted_at }}</span>
+                                        </div>
+                                    </div>
+                                    <form method="POST"
+                                          action="{{ url_for('admin_delete_record', table_name='feedback', record_id=f.id) }}"
+                                          style="flex-shrink:0;"
+                                          onsubmit="return confirm('Delete this feedback?')">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="page" value="1">
+                                        <input type="hidden" name="redirect_to" value="user:{{ target_user.id }}">
+                                        <button type="submit" class="btn-row-delete" title="Delete">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="pp-empty">No feedback submitted.</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Votes -->
+                        <div class="pp-section">
+                            <h4>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:4px;"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"></path><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                                Votes Cast ({{ entry.votes|length }})
+                            </h4>
+                            {% if entry.votes %}
+                                {% for v in entry.votes %}
+                                <div class="activity-item activity-item-deletable">
+                                    <div class="activity-item-body">
+                                        <div class="activity-content">{{ v.feedback_content }}</div>
+                                        <div class="activity-meta">
+                                            {% if v.feedback_category %}
+                                            <span class="activity-tag">{{ v.feedback_category }}</span>
+                                            {% endif %}
+                                            <span>Voted {{ v.voted_at }}</span>
+                                        </div>
+                                    </div>
+                                    <form method="POST"
+                                          action="{{ url_for('admin_delete_record', table_name='votes', record_id=v.id) }}"
+                                          style="flex-shrink:0;"
+                                          onsubmit="return confirm('Delete this vote?')">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="page" value="1">
+                                        <input type="hidden" name="redirect_to" value="user:{{ target_user.id }}">
+                                        <button type="submit" class="btn-row-delete" title="Delete">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="pp-empty">No votes cast.</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Five Whys -->
+                        <div class="pp-section">
+                            <h4>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:4px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                Root Cause Analysis — 5 Whys ({{ entry.five_whys_count }} steps)
+                            </h4>
+                            {% if entry.five_whys_groups %}
+                            {% for group in entry.five_whys_groups %}
+                            <div class="why-group">
+                                <div class="why-group-label">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;opacity:0.5;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                    <span>Analyzing root cause:</span>
+                                    <strong>{{ group.feedback_content }}</strong>
+                                </div>
+                                <div class="why-chain">
+                                    {% for w in group.whys %}
+                                    <div class="why-item why-item-deletable">
+                                        <div class="why-num" title="Step {{ w.why_number }}">{{ w.why_number }}</div>
+                                        <div class="why-content" style="flex:1;">
+                                            <div class="why-a">{{ w.answer or 'No answer given' }}</div>
+                                            <div class="why-q">{{ w.question }}</div>
+                                            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.2rem;">{{ w.submitted_at }}</div>
+                                        </div>
+                                        <form method="POST"
+                                              action="{{ url_for('admin_delete_record', table_name='five_whys_analysis', record_id=w.id) }}"
+                                              style="flex-shrink:0;"
+                                              onsubmit="return confirm('Delete this why entry?')">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <input type="hidden" name="page" value="1">
+                                            <input type="hidden" name="redirect_to" value="user:{{ target_user.id }}">
+                                            <button type="submit" class="btn-row-delete" title="Delete">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                                <p class="pp-empty">No five whys submitted.</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Similar Why Votes -->
+                        {% if entry.similar_why_votes %}
+                        <div class="pp-section">
+                            <h4>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:4px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Root Cause Votes ({{ entry.similar_why_votes|length }})
+                            </h4>
+                            {% for sv in entry.similar_why_votes %}
+                            <div class="activity-item activity-item-deletable">
+                                <div class="activity-item-body">
+                                    <div class="activity-content">{{ sv.why_text }}</div>
+                                    <div class="activity-meta">
+                                        <span>Voted {{ sv.voted_at }}</span>
+                                    </div>
+                                </div>
+                                <form method="POST"
+                                      action="{{ url_for('admin_delete_record', table_name='similar_why_votes', record_id=sv.id) }}"
+                                      style="flex-shrink:0;"
+                                      onsubmit="return confirm('Delete this vote?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="page" value="1">
+                                    <input type="hidden" name="redirect_to" value="user:{{ target_user.id }}">
+                                    <button type="submit" class="btn-row-delete" title="Delete">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Ideas -->
+                        <div class="pp-section">
+                            <h4>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:4px;"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>
+                                Ideas Submitted ({{ entry.ideas|length }})
+                            </h4>
+                            {% if entry.ideas %}
+                                {% for i in entry.ideas %}
+                                <div class="activity-item activity-item-deletable">
+                                    <div class="activity-item-body">
+                                        <div class="activity-content">{{ i.content }}</div>
+                                        <div class="activity-meta">
+                                            {% if i.normalized and i.normalized != i.content %}
+                                            <span title="AI-cleaned version of the submitted text">Cleaned up: {{ i.normalized }}</span>
+                                            {% endif %}
+                                            {% if i.category %}
+                                            <span class="activity-tag">{{ i.category }}</span>
+                                            {% endif %}
+                                            <span>{{ i.submitted_at }}</span>
+                                        </div>
+                                    </div>
+                                    <form method="POST"
+                                          action="{{ url_for('admin_delete_record', table_name='ideas', record_id=i.id) }}"
+                                          style="flex-shrink:0;"
+                                          onsubmit="return confirm('Delete this idea?')">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="page" value="1">
+                                        <input type="hidden" name="redirect_to" value="user:{{ target_user.id }}">
+                                        <button type="submit" class="btn-row-delete" title="Delete">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="pp-empty">No ideas submitted.</p>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        {% else %}
+            <div class="admin-empty">This user has not participated in any problems yet.</div>
+        {% endif %}
+    </section>
+
+</div>
+
+<script>
+function togglePP(header) {
+    const body = header.nextElementSibling;
+    const chevron = header.querySelector('.pp-chevron');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    chevron.classList.toggle('open', !isOpen);
+}
+</script>
+{% endblock %}

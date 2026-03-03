@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Phase 6: Final Problem Statement{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/phase6_final_statement_display.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- Use standard dashboard layout -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/phase_header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/phase6_final_statement_display.css') }}">
+
+<div class="dashboard-container">
+    <!-- Header -->
+    <header class="phase-header">
+        <div class="phase-header-left">
+            <a href="{{ url_for('dashboard') }}" class="phase-back-btn" title="Back to Dashboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div class="phase-header-info">
+                <h1>{{ problem.title }} <span class="phase-tag-inline phase-tag-deep-dive">Phase 6</span></h1>
+                <p class="phase-subtitle">Final Statement - Review the problem</p>
+            </div>
+        </div>
+        <div class="phase-header-right">
+            <div class="phase-timer-section">
+                {% if problem.is_live %}
+                <span class="phase-live-badge">
+                    <span class="phase-live-pulse"></span>
+                    LIVE
+                </span>
+                {% endif %}
+                <div class="phase-timer-display">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span id="phase-timer" class="time-value">--:--</span>
+                </div>
+            </div>
+
+            {% if is_session_creator %}
+            <button id="add-time-btn" class="phase-btn-add-time">+ 10 min</button>
+            <button id="start-results-phase-btn" class="phase-btn-next">
+                Next: Idea Collection
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14m-7-7l7 7-7 7" />
+                </svg>
+            </button>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="final-statement-content" style="padding-top: 1rem;">
+        <!-- Final Statement Card -->
+        <div class="statement-card">
+            <h2>Redefined Problem Statement</h2>
+
+
+            {% if problem.refined_problem_statement %}
+            <blockquote class="final-statement">
+                "{{ problem.refined_problem_statement }}"
+            </blockquote>
+            {% else %}
+            <div class="no-statement">
+                <p>No refined problem statement available.</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </main>
+
+    {% if not is_session_creator %}
+    <!-- User Message Card -->
+    <div class="user-message-card">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <p>Get ready to submit ideas for the problem!</p>
+    </div>
+    {% endif %}
+
+    <!-- Toasts -->
+    <div id="error-toast" class="toast error-toast" style="display: none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span id="error-message">An error occurred</span>
+    </div>
+
+    <div id="success-toast" class="toast success-toast" style="display: none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <span id="success-message">Success</span>
+    </div>
+</div>
+
+<!-- Config Data -->
+<div id="config-data" data-problem-id="{{ problem.id }}"
+    data-is-admin="{{ 'true' if is_session_creator else 'false' }}" data-current-phase="{{ problem.current_phase }}"
+    data-url-extend="{{ url_for('extend_time') }}"
+    data-url-status="{{ url_for('problem_status', problem_id=problem.id) }}"
+    data-url-start-phase="{{ url_for('start_phase') }}" data-remaining-time="{{ remaining_time|int }}"
+    style="display:none;"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/phase6_final_statement_display.js') }}"></script>
+{% endblock %}

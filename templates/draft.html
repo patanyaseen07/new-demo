@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="phase-header text-center mb-4">
+    <h1>{{ problem.title }}</h1>
+    <h3 class="text-muted" style="margin-top:0.5rem;">Phase: <span style="color:var(--accent-color);">Lobby /
+            Draft</span></h3>
+</div>
+
+<div class="card text-center" style="max-width: 600px; margin: 0 auto;">
+    <h3>Problem Description</h3>
+    <p class="text-muted mt-4" style="font-size:1.1rem; line-height:1.6;">{{ problem.description }}</p>
+
+    <div class="mt-4" style="padding: 2rem; background: var(--soft-parchment); border: 1px solid var(--border-color); border-radius: 12px;">
+        <p>Waiting for the session admin to begin Phase 1 (Cause Collection).</p>
+        <p class="text-muted" style="font-size:0.9rem;">The session will automatically refresh or you can reload when
+            instructed.</p>
+    </div>
+</div>
+
+{% if is_session_creator %}
+<div class="admin-controls card text-center mt-4" style="max-width: 600px; margin: 2rem auto;">
+    <h3>Admin Controls</h3>
+    <p class="mb-4">As an admin, you can start the collection phase. Usage of the timer will begin immediately.</p>
+    <form action="{{ url_for('start_phase') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="problem_id" value="{{ problem.id }}">
+        <input type="hidden" name="next_phase" value="collect">
+        <button class="btn btn-primary btn-full">Start Phase 1: Cause Collection &rarr;</button>
+    </form>
+</div>
+{% endif %}
+
+<div class="text-center mt-4">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+{% endblock %}

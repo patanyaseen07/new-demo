@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ problem.title }} — Admin{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+
+<div class="admin-container">
+
+    <!-- Header -->
+    <header class="admin-header">
+        <div>
+            <div class="admin-breadcrumb">
+                <a href="{{ url_for('dashboard') }}" class="breadcrumb-link">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 5l-7 7 7 7"></path>
+                    </svg>
+                    Dashboard
+                </a>
+                <span class="breadcrumb-sep">/</span>
+                <a href="{{ url_for('admin_panel') }}" class="breadcrumb-link">Admin Panel</a>
+                <span class="breadcrumb-sep">/</span>
+                <a href="{{ url_for('admin_table_view', table_name='problems') }}" class="breadcrumb-link">Problems</a>
+            </div>
+            <h1>Problem Session</h1>
+            <p>Full view — participants, submissions, and admin controls</p>
+        </div>
+        <div style="display:flex; gap:0.75rem; align-items:center;">
+            <!-- Delete entire problem -->
+            <form method="POST"
+                  action="{{ url_for('admin_delete_record', table_name='problems', record_id=problem.id) }}"
+                  onsubmit="return confirm('Delete this entire problem and ALL its data? This cannot be undone.')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="page" value="1">
+                <button type="submit" class="btn-danger-sm">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                    </svg>
+                    Delete Problem
+                </button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Problem Info Card -->
+    <div class="problem-info-card">
+        <div class="problem-info-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+        </div>
+        <div class="problem-info-body">
+            <div class="problem-info-title">{{ problem.title }}</div>
+            {% if problem.description %}
+            <div class="problem-info-desc">{{ problem.description }}</div>
+            {% endif %}
+            <div class="problem-info-meta">
+                <span class="phase-badge">{{ problem.current_phase | phase_display }}</span>
+                <span>Created {{ problem.created_at }}</span>
+                <span>by
+                    <a href="{{ url_for('admin_user_detail', user_id=problem.created_by_id) }}" class="cell-link">
+                        {{ problem.created_by_email }}
+                    </a>
+                </span>
+            </div>
+            {% if problem.refined_problem_statement %}
+            <div class="problem-refined">
+                <span class="problem-refined-label">Refined Statement:</span> {{ problem.refined_problem_statement }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="summary-stats">
+        <div class="summary-stat">
+            <div class="s-value">{{ summary.participant_count }}</div>
+            <div class="s-label">Participants</div>
+        </div>
+        <div class="summary-stat">
+            <div class="s-value">{{ summary.feedback_count }}</div>
+            <div class="s-label">Feedback</div>
+        </div>
+        <div class="summary-stat">
+            <div class="s-value">{{ summary.vote_count }}</div>
+            <div class="s-label">Votes</div>
+        </div>
+        <div class="summary-stat">
+            <div class="s-value">{{ summary.why_count }}</div>
+            <div class="s-label">Root Cause Steps</div>
+        </div>
+        <div class="summary-stat">
+            <div class="s-value">{{ summary.similar_vote_count }}</div>
+            <div class="s-label">Root Cause Votes</div>
+        </div>
+        <div class="summary-stat">
+            <div class="s-value">{{ summary.idea_count }}</div>
+            <div class="s-label">Ideas</div>
+        </div>
+    </div>
+
+    <!-- Participants -->
+    <section class="admin-section" style="margin-bottom:2rem;">
+        <h2>Participants ({{ summary.participant_count }})</h2>
+        {% if participants %}
+        <div class="participants-grid">
+            {% for p in participants %}
+            <a href="{{ url_for('admin_user_detail', user_id=p.id) }}" class="participant-chip">
+                <span class="participant-avatar">{{ p.email[0]|upper }}</span>
+                <span class="participant-email">{{ p.email }}</span>
+                <span class="role-badge {{ p.role }}" style="font-size:0.65rem;">{{ p.role }}</span>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="admin-empty">No participants yet.</div>
+        {% endif %}
+    </section>
+
+    <!-- Feedback -->
+    <section class="admin-section">
+        <div class="section-header-row">
+            <h2>
+                Feedback ({{ summary.feedback_count }})
+                {% if feedback_by_category %}
+                <span class="section-cats">
+                    {% for cat, cnt in feedback_by_category.items() %}
+                    <span class="activity-tag">{{ cat }} × {{ cnt }}</span>
+                    {% endfor %}
+                </span>
+                {% endif %}
+            </h2>
+        </div>
+        {% if feedbacks %}
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Content</th>
+                        <th>Cleaned Up Text</th>
+                        <th>Category</th>
+                        <th style="width:55px; text-align:center;">Votes</th>
+                        <th>Submitted</th>
+                        <th style="width:44px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in feedbacks %}
+                    <tr>
+                        <td>
+                            {% if f.user_email != 'Unknown User' %}
+                            <a href="{{ url_for('admin_user_detail', user_id=f.user_id) }}" class="cell-user-link">
+                                <span class="cell-email">{{ f.user_email }}</span>
+                                <span class="cell-user-icon">→</span>
+                            </a>
+                            {% else %}
+                            <span class="cell-email" style="color:var(--text-muted);">Unknown User</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ f.content }}</td>
+                        <td style="color:var(--text-muted); font-size:0.8rem;">
+                            {% if f.normalized and f.normalized != f.content %}{{ f.normalized }}{% else %}—{% endif %}
+                        </td>
+                        <td>{% if f.category %}<span class="activity-tag">{{ f.category }}</span>{% else %}—{% endif %}</td>
+                        <td style="text-align:center; font-weight:600; color:var(--deep-evergreen);">{{ f.vote_count }}</td>
+                        <td style="white-space:nowrap; color:var(--text-muted); font-size:0.78rem;">{{ f.submitted_at }}</td>
+                        <td>
+                            <form method="POST"
+                                  action="{{ url_for('admin_delete_record', table_name='feedback', record_id=f.id) }}"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Delete this feedback? Its votes will also be removed.')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="page" value="1">
+                                <input type="hidden" name="redirect_to" value="problem:{{ problem.id }}">
+                                <button type="submit" class="btn-row-delete" title="Delete feedback">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="admin-empty">No feedback submitted.</div>
+        {% endif %}
+    </section>
+
+    <!-- Five Whys -->
+    <section class="admin-section" style="margin-top:2rem;">
+        <h2>Five Whys ({{ summary.why_count }})</h2>
+        {% if five_whys %}
+        {% for feedback_id, why_chain in five_whys|groupby('feedback_id') %}
+        <div class="why-group-table">
+            <div class="why-group-label" style="margin-bottom:0.5rem;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;opacity:0.5;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>Analyzing root cause:</span>
+                <strong>{{ why_chain|first|attr('feedback_content') }}</strong>
+            </div>
+            <div class="admin-table-wrap" style="margin-bottom:0;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th style="width:44px; text-align:center;">#</th>
+                            <th>Question</th>
+                            <th>Answer</th>
+                            <th>Submitted</th>
+                            <th style="width:44px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for w in why_chain %}
+                        <tr>
+                            <td>
+                                {% if w.user_email != 'Unknown User' %}
+                                <a href="{{ url_for('admin_user_detail', user_id=w.user_id) }}" class="cell-user-link">
+                                    <span class="cell-email">{{ w.user_email }}</span>
+                                    <span class="cell-user-icon">→</span>
+                                </a>
+                                {% else %}
+                                <span class="cell-email" style="color:var(--text-muted);">Unknown User</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align:center;">
+                                <span class="why-num" style="margin:auto;">{{ w.why_number }}</span>
+                            </td>
+                            <td style="color:var(--text-muted); font-size:0.8rem;">{{ w.question or '—' }}</td>
+                            <td>{{ w.answer or '—' }}</td>
+                            <td style="white-space:nowrap; color:var(--text-muted); font-size:0.78rem;">{{ w.submitted_at }}</td>
+                            <td>
+                                <form method="POST"
+                                      action="{{ url_for('admin_delete_record', table_name='five_whys_analysis', record_id=w.id) }}"
+                                      style="display:inline;"
+                                      onsubmit="return confirm('Delete this why entry?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="page" value="1">
+                                    <input type="hidden" name="redirect_to" value="problem:{{ problem.id }}">
+                                    <button type="submit" class="btn-row-delete" title="Delete why">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="admin-empty">No five whys submitted.</div>
+        {% endif %}
+    </section>
+
+    <!-- Root Cause Votes -->
+    {% if similar_votes %}
+    <section class="admin-section" style="margin-top:2rem;">
+        <h2>Root Cause Votes ({{ summary.similar_vote_count }})</h2>
+        <p style="font-size:0.82rem; color:var(--text-muted); margin-top:-0.5rem; margin-bottom:1rem;">Participants who agreed with a root cause identified by others</p>
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Root Cause They Agreed With</th>
+                        <th>Voted</th>
+                        <th style="width:44px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sv in similar_votes %}
+                    <tr>
+                        <td>
+                            {% if sv.user_email != 'Unknown User' %}
+                            <a href="{{ url_for('admin_user_detail', user_id=sv.user_id) }}" class="cell-user-link">
+                                <span class="cell-email">{{ sv.user_email }}</span>
+                                <span class="cell-user-icon">→</span>
+                            </a>
+                            {% else %}
+                            <span class="cell-email" style="color:var(--text-muted);">Unknown User</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ sv.why_text }}</td>
+                        <td style="white-space:nowrap; color:var(--text-muted); font-size:0.78rem;">{{ sv.voted_at }}</td>
+                        <td>
+                            <form method="POST"
+                                  action="{{ url_for('admin_delete_record', table_name='similar_why_votes', record_id=sv.id) }}"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Delete this vote?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="page" value="1">
+                                <input type="hidden" name="redirect_to" value="problem:{{ problem.id }}">
+                                <button type="submit" class="btn-row-delete" title="Delete vote">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Ideas -->
+    <section class="admin-section" style="margin-top:2rem;">
+        <h2>
+            Ideas ({{ summary.idea_count }})
+            {% if ideas_by_category %}
+            <span class="section-cats">
+                {% for cat, cnt in ideas_by_category.items() %}
+                <span class="activity-tag">{{ cat }} × {{ cnt }}</span>
+                {% endfor %}
+            </span>
+            {% endif %}
+        </h2>
+        {% if ideas %}
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Content</th>
+                        <th>Cleaned Up Text</th>
+                        <th>Category</th>
+                        <th>Submitted</th>
+                        <th style="width:44px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in ideas %}
+                    <tr>
+                        <td>
+                            {% if i.user_email != 'Unknown User' %}
+                            <a href="{{ url_for('admin_user_detail', user_id=i.user_id) }}" class="cell-user-link">
+                                <span class="cell-email">{{ i.user_email }}</span>
+                                <span class="cell-user-icon">→</span>
+                            </a>
+                            {% else %}
+                            <span class="cell-email" style="color:var(--text-muted);">Unknown User</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ i.content }}</td>
+                        <td style="color:var(--text-muted); font-size:0.8rem;">
+                            {% if i.normalized and i.normalized != i.content %}{{ i.normalized }}{% else %}—{% endif %}
+                        </td>
+                        <td>{% if i.category %}<span class="activity-tag">{{ i.category }}</span>{% else %}—{% endif %}</td>
+                        <td style="white-space:nowrap; color:var(--text-muted); font-size:0.78rem;">{{ i.submitted_at }}</td>
+                        <td>
+                            <form method="POST"
+                                  action="{{ url_for('admin_delete_record', table_name='ideas', record_id=i.id) }}"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Delete this idea?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="page" value="1">
+                                <input type="hidden" name="redirect_to" value="problem:{{ problem.id }}">
+                                <button type="submit" class="btn-row-delete" title="Delete idea">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="admin-empty">No ideas submitted.</div>
+        {% endif %}
+    </section>
+
+</div>
+{% endblock %}

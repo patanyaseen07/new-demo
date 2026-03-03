@@ -1,0 +1,103 @@
+.voting-item {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    background: white;
+    transition: all 0.2s;
+}
+
+.voting-item:hover {
+    border-color: #CCCCCC;
+    background: #FAFAFA;
+}
+
+/* Already submitted votes (from server) */
+.voting-item.voted {
+    background: #F0FDF4;
+    /* confirmed = green */
+    border-color: #16a34a;
+    font-weight: 600;
+}
+
+/* Ensure check icon is visible for voted items */
+.voting-item.voted .vote-indicator .check-icon {
+    display: inline-block;
+}
+
+/* Hide the single dot for voted items, show checkmark */
+.voting-item.voted .vote-indicator .vote-dot {
+    display: none;
+}
+
+/* Vote Indicator Container */
+.vote-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    /* Fixed width for consistent alignment */
+    height: 24px;
+    position: relative;
+}
+
+/* Hide checkmark by default, will be shown for .voted items */
+.vote-indicator .check-icon {
+    display: none;
+    position: absolute;
+    font-size: 1.2rem;
+}
+
+/* Single Vote Dot */
+.vote-dot {
+    width: 12px;
+    /* Larger single dot */
+    height: 12px;
+    background-color: var(--success-color);
+    /* Green color for the dot */
+    border-radius: 50%;
+    opacity: 0;
+    /* Hidden by default */
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+    transform: scale(0.5);
+    /* Start smaller */
+}
+
+/* Currently selected but not submitted */
+.voting-item.selected {
+    background: #F5F5F5;
+    color: var(--black-forest);
+    font-weight: 600;
+    border-color: #1A1A1A;
+    transform: scale(1.01);
+}
+
+/* Show single dot when selected */
+.voting-item.selected .vote-indicator .vote-dot {
+    opacity: 1;
+    transform: scale(1);
+    /* Scale up to full size */
+}
+
+/* Hide checkmark when selected (unless it's a voted item) */
+.voting-item.selected .vote-indicator .check-icon {
+    display: none;
+}
+
+/* Fix for when .voted is present, hover shouldn't do much if we want it read-only feels */
+/* Fix for when .votes-locked is present */
+.all-ideas-list.votes-locked {
+    opacity: 0.8;
+}
+
+.all-ideas-list.votes-locked .voting-item:hover {
+    border-color: var(--border-color);
+    background: white;
+    /* Reset hover if locked */
+    cursor: default;
+}
+
+.all-ideas-list.votes-locked .voting-item.voted:hover {
+    background: #F0FDF4;
+    border-color: #16a34a;
+}

@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Phase 4: Deep Dive - {{ problem.title }}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/phase4_deep_dive.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/phase_header.css') }}">
+<script src="{{ url_for('static', filename='js/phase4_deep_dive.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <header class="phase-header">
+        <div class="phase-header-left">
+            <a href="{{ url_for('dashboard') }}" class="phase-back-btn" title="Back to Dashboard">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div class="phase-header-info">
+                <h1>{{ problem.title }} <span class="phase-tag-inline phase-tag-deep-dive">Phase 4</span></h1>
+                <p class="phase-subtitle">Deep Dive - Explore root causes with 5 Whys analysis</p>
+            </div>
+        </div>
+
+        <div class="phase-header-right">
+            <!-- Timer Section -->
+            <div class="phase-timer-section">
+                {% if remaining_time > 0 %}
+                <span class="phase-live-badge">
+                    <span class="phase-live-pulse"></span>
+                    LIVE
+                </span>
+                {% endif %}
+                <div class="phase-timer-display">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span id="phase-timer" class="time-value" data-remaining="{{ remaining_time|int }}">--:--</span>
+                </div>
+                {% if is_session_creator %}
+                <button id="add-time-btn" class="phase-btn-add-time" onclick="addMoreTime()" title="Add 10 minutes">
+                    +10 min
+                </button>
+                {% endif %}
+            </div>
+
+            <!-- Admin Actions -->
+            {% if is_session_creator %}
+            <form action="{{ url_for('start_phase') }}" method="POST" class="phase-next-form"
+                onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').innerText='Processing...';">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="problem_id" value="{{ problem.id }}">
+                <input type="hidden" name="next_phase" value="similar_whys">
+                <button type="submit" class="phase-btn-next">
+                    Next: Similar Whys
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </header>
+
+
+    <div id="submissionMessage" class="alert alert-success text-center mt-4" style="display: none;">
+        Whys submitted successfully! Please wait until the next phase starts.
+    </div>
+
+    <div id="deepDiveContentWrapper">
+        <div class="deep-dive-content">
+            {% if data.selected_causes %}
+            {% for cause in data.selected_causes %}
+            <div class="cause-section" data-feedback-id="{{ cause.id }}">
+                <div class="cause-header">
+                    <h2 class="cause-title">{{ cause.normalized_content }}</h2>
+                    <span class="cause-badge">5 Why's Analysis</span>
+                </div>
+                <div class="five-whys-container">
+                    {% for i in range(1, 6) %}
+                    <div class="why-step" data-depth="{{ i }}">
+                        <div class="why-timeline">
+                            <div class="why-dot">{{ i }}</div>
+                            {% if i < 5 %}<div class="why-line">
+                        </div>{% endif %}
+                    </div>
+                    <div class="why-content">
+                        <div class="why-label">Why {{ i }}?</div>
+                        <div class="why-input-group">
+                            {% set existing_why_answer = '' %}
+                            {% for existing_why in cause.whys %}
+                            {% if existing_why.why_number == i %}
+                            {% set existing_why_answer = existing_why.answer %}
+                            {% endif %}
+                            {% endfor %}
+                            <input type="text" class="why-input" id="why-{{ cause.id }}-{{ i }}"
+                                name="why-{{ cause.id }}-{{ i }}" data-why-number="{{ i }}"
+                                placeholder="What caused this?" value="{{ existing_why_answer }}" {% if user_has_completed_deep_dive %} disabled {% elif i==1 %} {% elif
+                                existing_why_answer %} {% else %} disabled {% endif %}>
+                            {% if user and not user_has_completed_deep_dive %}
+                            <button type="button"
+                                class="btn-tick {% if existing_why_answer %}hidden{% elif i > 1 and not existing_why_answer %}hidden{% endif %}"
+                                data-cause-id="{{ cause.id }}" data-why-number="{{ i }}">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No causes selected for deep dive yet. Please wait for the admin to select causes.</p>
+        {% endif %}
+    </div>
+
+    <div class="submit-section text-center mt-4 mb-4" style="padding-top: 2rem;">
+        {% if user_has_completed_deep_dive %}
+        <div class="p-4"
+            style="background:var(--card-bg); border:1px solid var(--success-color); border-radius:12px; display:inline-block; padding: 1.5rem 2rem;">
+            <div style="color:var(--success-color); margin-bottom:0.5rem; font-size: 1.5rem;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h3 style="color:var(--success-color); margin-bottom:0.5rem;">Whys Submitted</h3>
+            <p class="mb-2 text-muted">Your whys are locked. Wait for next phase.</p>
+            <button onclick="window.location.reload()" class="btn-secondary btn-sm" style="margin-top: 1rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 4v6h-6"></path>
+                    <path d="M1 20v-6h6"></path>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                Refresh Status
+            </button>
+        </div>
+        {% elif user %}
+        <div class="deep-dive-footer">
+            <button id="submitAllWhysBtnBottom" class="btn btn-primary {% if problem.is_live %}btn-enter-live{% endif %}"
+                disabled>Submit All Whys</button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+
+<div id="deepDiveData" data-selected-causes="{{ data.selected_causes | tojson }}" data-has-completed="{{ 'true' if user_has_completed_deep_dive else 'false' }}"></div>
+<div id="config-data" data-problem-id="{{ problem.id }}"
+    data-is-admin="{{ 'true' if is_session_creator else 'false' }}" data-url-start="{{ url_for('start_phase') }}"
+    data-url-extend="{{ url_for('extend_time') }}"
+    data-url-status="{{ url_for('problem_status', problem_id=problem.id) }}" style="display:none;">
+</div>
+<script>
+    (function () {
+        const el = document.getElementById('config-data');
+        window.FISHBONE_CONFIG = {
+            problemId: el.dataset.problemId,
+            isAdmin: el.dataset.isAdmin === 'true',
+            urls: {
+                startPhase: el.dataset.urlStart,
+                extendTime: el.dataset.urlExtend,
+                status: el.dataset.urlStatus
+            }
+        };
+    })();
+    const problemId = "{{ problem.id }}"; // Keep for existing JS that might use it directly
+    const userRole = "{{ user.role }}"; // Keep for existing JS that might use it directly
+    const currentPhase = "deep_dive"; // Hardcode for this template
+    let selectedCausesData = [];
+    const rawSelectedCausesData = document.getElementById('deepDiveData').dataset.selectedCauses;
+    try {
+        selectedCausesData = JSON.parse(rawSelectedCausesData);
+    } catch (e) {
+        console.error('ERROR (template): Failed to parse selectedCausesData JSON:', e);
+        console.error('ERROR (template): Raw data-selected-causes attribute content:', rawSelectedCausesData);
+    }
+</script>
+{% endblock %}

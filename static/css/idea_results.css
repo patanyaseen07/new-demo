@@ -1,0 +1,217 @@
+/* --- Podium Section (Top 3) --- */
+.podium-section {
+    margin-bottom: 1.5rem;
+}
+
+.podium-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Base podium card — now a horizontal row */
+.podium-card {
+    background: var(--card-bg, #fff);
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    text-align: left;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.podium-card:hover {
+    transform: translateY(-2px);
+}
+
+/* --- Rank 1: Gold --- */
+.podium-rank-1 {
+    border: 2px solid #F59E0B;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.06) 0%, rgba(245, 158, 11, 0.12) 30%, #fff 100%);
+}
+
+.podium-rank-1:hover {
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.28), 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* --- Rank 2: Silver --- */
+.podium-rank-2 {
+    border: 2px solid #94A3B8;
+    box-shadow: 0 0 16px rgba(148, 163, 184, 0.18), 0 4px 12px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(135deg, rgba(148, 163, 184, 0.06) 0%, rgba(148, 163, 184, 0.12) 30%, #fff 100%);
+}
+
+.podium-rank-2:hover {
+    box-shadow: 0 0 24px rgba(148, 163, 184, 0.28), 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* --- Rank 3: Bronze --- */
+.podium-rank-3 {
+    border: 2px solid #CD7F32;
+    box-shadow: 0 0 16px rgba(205, 127, 50, 0.16), 0 4px 12px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(135deg, rgba(205, 127, 50, 0.06) 0%, rgba(205, 127, 50, 0.12) 30%, #fff 100%);
+}
+
+.podium-rank-3:hover {
+    box-shadow: 0 0 24px rgba(205, 127, 50, 0.24), 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Medal icon — hidden */
+.podium-medal {
+    display: none;
+}
+
+/* Rank badge — inline in row */
+.podium-rank-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.75rem;
+    border-radius: 20px;
+    flex-shrink: 0;
+}
+
+.podium-rank-badge.rank-1 {
+    background: rgba(245, 158, 11, 0.18);
+    color: #92400E;
+}
+
+.podium-rank-badge.rank-2 {
+    background: rgba(148, 163, 184, 0.22);
+    color: #334155;
+}
+
+.podium-rank-badge.rank-3 {
+    background: rgba(205, 127, 50, 0.2);
+    color: #7C2D12;
+}
+
+/* Podium text — fills remaining space */
+.podium-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--deep-evergreen, #333333);
+    line-height: 1.4;
+    margin: 0;
+    flex: 1;
+}
+
+/* Podium vote count — right side */
+.podium-votes {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--deep-evergreen, #333333);
+    padding: 0.3rem 0.7rem;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 20px;
+    flex-shrink: 0;
+}
+
+.podium-votes svg {
+    opacity: 0.7;
+}
+
+/* --- Remaining Ideas Section --- */
+.remaining-section {
+    margin-bottom: 2rem;
+}
+
+.remaining-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-muted, #666);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.75rem;
+    padding-left: 0.25rem;
+}
+
+.remaining-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.remaining-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #e5e5e5);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    transition: background 0.2s ease;
+}
+
+.remaining-item:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.remaining-rank {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--deep-evergreen, #333333);
+    font-weight: 700;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.remaining-text {
+    flex: 1;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-color, #333);
+    line-height: 1.4;
+}
+
+.remaining-votes {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-muted, #666);
+    flex-shrink: 0;
+}
+
+.remaining-votes svg {
+    opacity: 0.5;
+}
+
+/* --- Voter Count Badge --- */
+.voter-count-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    border-radius: 12px;
+    border: none;
+    margin-top: 1rem;
+}
+
+.voter-count-badge span {
+    font-weight: 600;
+    color: var(--deep-evergreen, #333333);
+    font-size: 0.95rem;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .podium-grid {
+        grid-template-columns: 1fr;
+    }
+}

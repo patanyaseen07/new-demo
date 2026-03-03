@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Email Verification{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-form-side" style="margin: auto; max-width: 480px; padding: 4rem 2rem;">
+        <div class="auth-form-container" style="text-align: center;">
+            {% if status == 'success' %}
+            <div style="width:64px;height:64px;margin:0 auto 1.5rem;background:#d1fae5;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h2 style="color: #047857; margin-bottom: 1rem;">Email Verified</h2>
+            {% elif status == 'already_verified' %}
+            <div style="width:64px;height:64px;margin:0 auto 1.5rem;background:#dbeafe;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h2 style="margin-bottom: 1rem;">Already Verified</h2>
+            {% else %}
+            <div style="width:64px;height:64px;margin:0 auto 1.5rem;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </div>
+            <h2 style="color: #dc3545; margin-bottom: 1rem;">Verification Failed</h2>
+            {% endif %}
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">{{ message }}</p>
+            <a href="{{ url_for('login') }}" class="btn-primary"
+               style="display:inline-block;padding:0.75rem 2rem;text-decoration:none;">
+                Go to Sign In
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

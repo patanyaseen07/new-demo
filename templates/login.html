@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-hero-side">
+        <div class="auth-hero-overlay"></div>
+        <div class="auth-hero-content">
+            <h2>Problem Solving Workshop</h2>
+            <p>Uncover deep insights and solve complex problems with collaborative root cause analysis.</p>
+        </div>
+    </div>
+    <div class="auth-form-side">
+        <div class="auth-form-container">
+            <h2 class="mb-4">Welcome Back</h2>
+
+            <!-- Shown when Azure AD is configured (MSAL.js handles login) -->
+            <div id="msal-login" style="display:none;">
+                <p class="text-muted">Signing in with Microsoft...</p>
+            </div>
+
+            <!-- Shown when Azure AD is NOT configured (email + password with DB) -->
+            <div id="fallback-login" style="display:none;">
+                <p class="text-muted" style="margin-bottom:1.5rem;" id="fallback-subtitle">Sign in with your email and password.</p>
+                <form id="fallback-login-form" onsubmit="return handleFallbackLogin(event)">
+                    <div style="margin-bottom:1rem;">
+                        <input type="email" id="fallback-email" placeholder="your.name@cgi.com" required
+                            style="width:100%;padding:0.75rem 1rem;border:1px solid #E0E0E0;border-radius:8px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.2s;">
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <input type="password" id="fallback-password" placeholder="Password" required minlength="6"
+                            style="width:100%;padding:0.75rem 1rem;border:1px solid #E0E0E0;border-radius:8px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.2s;">
+                    </div>
+                    <!-- Only shown during registration -->
+                    <div id="fallback-name-field" style="margin-bottom:1rem;display:none;">
+                        <input type="text" id="fallback-name" placeholder="Your Name (optional)"
+                            style="width:100%;padding:0.75rem 1rem;border:1px solid #E0E0E0;border-radius:8px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.2s;">
+                    </div>
+                    <div id="fallback-role-field" style="margin-bottom:1rem;display:none;">
+                        <label for="fallback-role" style="display:block;margin-bottom:0.35rem;font-size:0.85rem;color:var(--text-muted);">Select your role</label>
+                        <select id="fallback-role"
+                            style="width:100%;padding:0.75rem 1rem;border:1px solid #E0E0E0;border-radius:8px;font-size:0.95rem;font-family:inherit;outline:none;background:white;cursor:pointer;">
+                            <option value="user">User</option>
+                        </select>
+                    </div>
+                    <button type="submit" id="fallback-btn"
+                        style="width:100%;padding:0.75rem;background:#E11937;color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.2s;">
+                        Sign In
+                    </button>
+                    <p id="fallback-error" style="color:#dc3545;margin-top:0.75rem;font-size:0.875rem;display:none;"></p>
+                    <p id="fallback-success" style="color:#047857;margin-top:0.75rem;font-size:0.875rem;display:none;"></p>
+                </form>
+                <div style="margin-top:1rem;text-align:center;">
+                    <a href="#" id="fallback-toggle-register" onclick="toggleFallbackMode(event)" style="color:#E11937;font-size:0.875rem;text-decoration:underline;">
+                        Don't have an account? Register
+                    </a>
+                </div>
+            </div>
+            <div class="mt-4 text-center">
+                <p class="text-muted">Sign in to access the Problem Solving Workshop tool.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ─── Email + Password login handlers ─────────────────────────
+
+let fallbackIsRegister = false;
+let rolesLoaded = false;
+
+function loadRoles() {
+    if (rolesLoaded) return;
+    fetch('/api/roles')
+        .then(r => r.json())
+        .then(data => {
+            const select = document.getElementById('fallback-role');
+            select.innerHTML = '';
+            (data.roles || []).forEach(role => {
+                const opt = document.createElement('option');
+                opt.value = role.value;
+                opt.textContent = role.label;
+                select.appendChild(opt);
+            });
+            rolesLoaded = true;
+        })
+        .catch(() => {});
+}
+
+function toggleFallbackMode(e) {
+    e.preventDefault();
+    fallbackIsRegister = !fallbackIsRegister;
+    const btn = document.getElementById('fallback-btn');
+    const toggle = document.getElementById('fallback-toggle-register');
+    const nameField = document.getElementById('fallback-name-field');
+    const roleField = document.getElementById('fallback-role-field');
+    const subtitle = document.getElementById('fallback-subtitle');
+    const errorEl = document.getElementById('fallback-error');
+    const successEl = document.getElementById('fallback-success');
+    errorEl.style.display = 'none';
+    successEl.style.display = 'none';
+
+    if (fallbackIsRegister) {
+        btn.textContent = 'Register';
+        toggle.textContent = 'Already have an account? Sign in';
+        nameField.style.display = 'block';
+        roleField.style.display = 'block';
+        subtitle.textContent = 'Create a new account with your @cgi.com email.';
+        loadRoles();
+    } else {
+        btn.textContent = 'Sign In';
+        toggle.textContent = "Don't have an account? Register";
+        nameField.style.display = 'none';
+        roleField.style.display = 'none';
+        subtitle.textContent = 'Sign in with your email and password.';
+    }
+}
+
+function handleFallbackLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('fallback-email').value.trim();
+    const password = document.getElementById('fallback-password').value;
+    const name = document.getElementById('fallback-name').value.trim();
+    const role = document.getElementById('fallback-role') ? document.getElementById('fallback-role').value : 'user';
+    const btn = document.getElementById('fallback-btn');
+    const errorEl = document.getElementById('fallback-error');
+    const successEl = document.getElementById('fallback-success');
+
+    if (!email || !password) return false;
+
+    btn.disabled = true;
+    btn.textContent = fallbackIsRegister ? 'Registering...' : 'Signing in...';
+    errorEl.style.display = 'none';
+    successEl.style.display = 'none';
+
+    const endpoint = fallbackIsRegister ? '/api/auth/fallback_register' : '/api/auth/fallback_login';
+    const payload = { email, password, name: name || email.split('@')[0] };
+    if (fallbackIsRegister) payload.role = role;
+
+    fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.status === 'success') {
+            if (fallbackIsRegister) {
+                // Registration successful — show verification message
+                successEl.textContent = data.message || 'Account created! Check your email to verify your account.';
+                successEl.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Register';
+                // Clear form fields
+                document.getElementById('fallback-email').value = '';
+                document.getElementById('fallback-password').value = '';
+                document.getElementById('fallback-name').value = '';
+            } else {
+                window.location.href = '/dashboard';
+            }
+        } else {
+            errorEl.textContent = data.message || 'Failed.';
+            errorEl.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = fallbackIsRegister ? 'Register' : 'Sign In';
+        }
+    })
+    .catch(() => {
+        errorEl.textContent = 'Network error. Please try again.';
+        errorEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = fallbackIsRegister ? 'Register' : 'Sign In';
+    });
+
+    return false;
+}
+
+// ─── END Email + Password login ──────────────────────────────
+</script>
+{% endblock %}

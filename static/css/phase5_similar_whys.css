@@ -1,0 +1,106 @@
+/* Phase 5: Similar Whys - Dot Voting Specific Styles */
+
+/* Vote Category Card */
+.vote-category-card {
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Voting Items */
+.voting-item {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    background: white;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.voting-item:hover {
+    border-color: #CCCCCC;
+    background: #FAFAFA;
+}
+
+/* Already submitted votes */
+.voting-item.voted {
+    background: #F0FDF4;
+    border-color: #16a34a;
+    font-weight: 600;
+}
+
+.voting-item.voted .vote-indicator .check-icon {
+    display: inline-block;
+}
+
+.voting-item.voted .vote-indicator .vote-dot {
+    display: none;
+}
+
+/* Vote Indicator */
+.vote-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    position: relative;
+}
+
+.vote-indicator .check-icon {
+    display: none;
+    position: absolute;
+    font-size: 1.2rem;
+}
+
+/* Vote Dot */
+.vote-dot {
+    width: 14px;
+    height: 14px;
+    background-color: var(--success-color);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+    transform: scale(0.5);
+    display: block;
+}
+
+/* Currently selected but not submitted */
+.voting-item.selected {
+    background: #F5F5F5;
+    color: var(--black-forest);
+    font-weight: 600;
+    border-color: #1A1A1A;
+    transform: scale(1.01);
+}
+
+.voting-item.selected .vote-indicator .vote-dot {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.voting-item.selected .vote-indicator .check-icon {
+    display: none;
+}
+
+/* Submit Section */
+.submit-section {
+    padding-top: 2rem;
+    text-align: center;
+}
+
+.submit-section .btn-primary.btn-lg {
+    font-size: 1rem;
+    padding: 0.85rem 2.5rem;
+    font-weight: 600;
+}
+
+.submit-section #vote-count-display {
+    font-weight: 600;
+    color: #E11937;
+}

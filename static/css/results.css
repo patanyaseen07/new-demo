@@ -1,0 +1,186 @@
+/* Styles for the results page */
+
+/* Header content alignment */
+.dashboard-header .header-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    /* Space between back button and text content */
+}
+
+.dashboard-header .header-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    /* Space between back button and title group */
+}
+
+.dashboard-header .header-nav-left .btn-text {
+    padding: 0;
+    /* Remove extra padding from back button */
+}
+
+.dashboard-header .header-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    /* Space between title and phase tag */
+}
+
+.dashboard-header .header-title-group h1 {
+    font-size: 1.75rem;
+    /* Consistent with dashboard.css */
+    margin-bottom: 0;
+    /* Remove default margin */
+}
+
+.dashboard-header .header-subtitle {
+    display: block;
+    margin-top: 0.25rem;
+    /* Reduced margin for tighter spacing */
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* Header actions container */
+.header-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* Admin controls section */
+.admin-controls-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* Specific button styling for results page */
+.header-actions .btn-primary,
+.admin-controls .btn-primary,
+.admin-controls .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.admin-controls .export-button {
+    margin-left: 1rem;
+    /* Adjust margin for the export button */
+}
+
+.admin-controls .inline-form {
+    display: inline;
+}
+
+/* Selectable cause item styling */
+.vote-result-item.selectable-cause {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    /* For potential checkmark or border */
+    border: 2px solid #ddd;
+}
+
+.vote-result-item.selectable-cause:hover {
+    background-color: #FAFAFA;
+    /* subtle neutral hover */
+    border-color: #CCCCCC;
+}
+
+.vote-result-item.selectable-cause.selected {
+    border-color: #1A1A1A;
+    /* Stronger border for selected */
+    background-color: #F5F5F5;
+    /* selected = dark/neutral, not red */
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+    /* Subtle shadow to indicate selection */
+}
+
+/* Optional: Add a visual indicator for selected items */
+.vote-result-item.selectable-cause.selected::before {
+    content: '✓';
+    /* Checkmark */
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    font-size: 1.5em;
+    color: #16a34a;
+    font-weight: bold;
+}
+
+/* General layout for results grid */
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+}
+
+/* Styling for individual result cards */
+.result-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.result-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.result-card h3 {
+    color: #1A1A1A;
+    font-size: 1.25rem;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.result-card p {
+    color: var(--text-color);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+    /* Allows description to take up available space */
+}
+
+.result-card .votes {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+
+.result-card .votes svg {
+    color: var(--text-muted);
+}
+
+.category-tag {
+    display: inline-block;
+    background-color: var(--accent-color-light);
+    color: var(--accent-color-dark);
+    padding: 0.3em 0.7em;
+    border-radius: 5px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+/* Fishbone positions are now set dynamically by fishbone_scale.js */

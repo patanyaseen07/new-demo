@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Load CSS for consistent styling -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/phase_header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/idea_vote.css') }}">
+
+<div class="dashboard-container">
+    <!-- Header Section -->
+    <header class="phase-header">
+        <div class="phase-header-left">
+            <a href="{{ url_for('dashboard') }}" class="phase-back-btn" title="Back to Dashboard">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div class="phase-header-info">
+                <h1>{{ problem.refined_problem_statement }} <span class="phase-tag-inline phase-tag-vote">Phase 7</span>
+                </h1>
+                {% if data.my_votes %}
+                <p class="phase-subtitle" style="color: var(--success-color);">Votes Submitted. Waiting for results.</p>
+                {% else %}
+                <p class="phase-subtitle">Idea Voting - Select the ideas you believe are most impactful</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="phase-header-right">
+            <!-- Timer Section -->
+            <div class="phase-timer-section">
+                {% if problem.is_live %}
+                <span class="phase-live-badge">
+                    <span class="phase-live-pulse"></span>
+                    LIVE
+                </span>
+                {% endif %}
+                <div class="phase-timer-display">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span id="phase-timer" class="time-value" data-remaining="{{ remaining_time|int }}">--:--</span>
+                </div>
+                {% if is_session_creator %}
+                <button id="add-time-btn" class="phase-btn-add-time" onclick="addMoreTime()" title="Add 10 minutes">
+                    +10 min
+                </button>
+                {% endif %}
+            </div>
+
+            <!-- Admin Controls -->
+            {% if is_session_creator %}
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                {% if not problem.phase_start_time %}
+                <form action="{{ url_for('start_phase') }}" method="POST" class="phase-next-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="problem_id" value="{{ problem.id }}">
+                    <input type="hidden" name="next_phase" value="idea_vote">
+                    <button type="submit" class="phase-btn-add-time"
+                        onclick="this.disabled=true; this.innerText='...';">
+                        Start Timer
+                    </button>
+                </form>
+                {% endif %}
+
+                <form action="{{ url_for('start_phase') }}" method="POST" class="phase-next-form"
+                    onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').innerText='Processing...';">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="problem_id" value="{{ problem.id }}">
+                    <input type="hidden" name="next_phase" value="idea_results">
+                    <button type="submit" class="phase-btn-next">
+                        Next: Idea Results
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </header>
+
+    <div style="max-width: 800px; margin: 0 auto;">
+        <div
+            style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <div>
+                    <h2
+                        style="color: var(--black-forest); font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">
+                        All
+                        Ideas</h2>
+                    <p class="text-muted" style="margin: 0; font-size: 0.95rem;">Select the ideas you believe will have
+                        the
+                        most impact.</p>
+                </div>
+                <span class="badge-count"
+                    style="background: rgba(0, 0, 0, 0.06); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; border: 1px solid var(--border-color); color: var(--text-muted);">
+                    {% set ns = namespace(count=0) %}
+                    {% for category, items in data.grouped_ideas.items() %}
+                    {% set ns.count = ns.count + items|length %}
+                    {% endfor %}
+                    {{ ns.count }} ideas
+                </span>
+            </div>
+
+            <div class="all-ideas-list {% if data.my_votes %}votes-locked{% endif %}">
+                {% if ns.count > 0 %}
+                {% for category, items in data.grouped_ideas.items() %}
+                {% for item in items %}
+                <div class="idea-item voting-item {% if item.id in data.my_votes %}voted{% endif %}" {% if not
+                    data.my_votes %} onclick="toggleSelection('{{ item.id }}', this)" style="cursor:pointer;" {% else %}
+                    style="cursor:default;" {% endif %} data-id="{{ item.id }}"
+                    style="background: var(--bg-color); padding: 1rem 1.25rem; border-radius: 12px; margin-bottom: 0.75rem; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease;">
+
+                    <div style="flex: 1; padding-right: 1rem;">
+                        <span
+                            style="font-weight: 500; font-size: 1.05rem; color: var(--black-forest); line-height: 1.5; display: block;">{{
+                            item.normalized_content }}</span>
+                    </div>
+
+                    <span class="vote-indicator" style="flex-shrink: 0;">
+                        <span class="vote-dot"></span>
+                        <span class="check-icon" style="color: var(--success-color);">&#10003;</span>
+                    </span>
+                </div>
+                {% endfor %}
+                {% endfor %}
+                {% else %}
+                <div class="empty-state text-center"
+                    style="padding: 3rem; background: var(--bg-color); border-radius: 12px; border: 1px dashed var(--border-color);">
+                    <div style="color: var(--text-muted); margin-bottom: 0.5rem;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1" style="opacity: 0.5;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <p style="color: var(--text-muted);">No ideas to vote on yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="submit-section text-center mt-4 mb-4" style="padding-top: 2rem;">
+        {% if data.my_votes %}
+        <div
+            style="background:var(--card-bg); border:1px solid var(--success-color); border-radius:12px; display:inline-block; padding: 1.5rem 2rem;">
+            <div style="color:var(--success-color); margin-bottom:0.5rem; font-size: 1.5rem;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h3 style="color:var(--success-color); margin-bottom:0.5rem;">Votes Recorded</h3>
+            <p class="mb-2 text-muted">Your choices are locked. The session will advance automatically.</p>
+            <button onclick="window.location.reload()" class="btn-secondary btn-sm" style="margin-top: 1rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 4v6h-6"></path>
+                    <path d="M1 20v-6h6"></path>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                Refresh Status
+            </button>
+        </div>
+        {% else %}
+        <div
+            style="background: var(--card-bg); padding: 2rem; border-radius: 12px; border: 3px solid var(--accent-color); display: block; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            <h3 style="color: var(--deep-evergreen); margin-bottom: 0.75rem; font-size: 1.3rem; font-weight: 800;">
+                Select Votes</h3>
+            <p class="text-muted"
+                style="font-size: 1.05rem; margin-bottom: 1.5rem; color: var(--text-muted); line-height: 1.6;">
+                <span id="vote-count-display" style="font-weight: 600; color: var(--deep-evergreen);">0 / 3 votes
+                    selected.</span> Select up to 3 ideas you agree with, then click Submit.
+            </p>
+            <button id="submit-votes-btn" class="btn-primary btn-lg {% if problem.is_live %}btn-enter-live{% endif %}"
+                onclick="submitVotes()" disabled style="font-size: 1rem; padding: 0.85rem 2.5rem; font-weight: 600;">
+                Submit Votes
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+    <div id="config-data" data-problem-id="{{ problem.id }}"
+        data-is-admin="{{ 'true' if is_session_creator else 'false' }}"
+        data-has-voted="{{ 'true' if data.my_votes else 'false' }}" data-my-votes-count="{{ data.my_votes|length }}"
+        data-vote-limit="3" data-url-start="{{ url_for('start_phase') }}" data-url-extend="{{ url_for('extend_time') }}"
+        data-url-vote="{{ url_for('vote_idea') }}" style="display:none;">
+    </div>
+    <script>
+        (function () {
+            const el = document.getElementById('config-data');
+            window.FISHBONE_CONFIG = {
+                problemId: el.dataset.problemId,
+                isAdmin: el.dataset.isAdmin === 'true',
+                hasVoted: el.dataset.hasVoted === 'true',
+                myVotesCount: parseInt(el.dataset.myVotesCount || '0'),
+                voteLimit: parseInt(el.dataset.voteLimit || '3'),
+                urls: {
+                    startPhase: el.dataset.urlStart,
+                    extendTime: el.dataset.urlExtend,
+                    vote: el.dataset.urlVote,
+                    status: "{{ url_for('problem_status', problem_id=problem.id) }}"
+                }
+            };
+        })();
+    </script>
+    <script src="{{ url_for('static', filename='js/idea_vote.js') }}?v=1"></script>
+    {% endblock %}

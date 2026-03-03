@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/phase_header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/idea_results.css') }}">
+
+<div class="dashboard-container">
+    <!-- Header Section -->
+    <header class="phase-header">
+        <div class="phase-header-left">
+            <a href="{{ url_for('dashboard') }}" class="phase-back-btn" title="Back to Dashboard">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div class="phase-header-info">
+                <h1>{{ problem.title }} <span class="phase-tag-inline phase-tag-result">Phase 8</span></h1>
+                <p class="phase-subtitle">Review the ideas prioritized by votes</p>
+            </div>
+        </div>
+
+        <div class="phase-header-right">
+            <!-- Timer Section -->
+            <div class="phase-timer-section">
+                {% if problem.is_live %}
+                <span class="phase-live-badge">
+                    <span class="phase-live-pulse"></span>
+                    LIVE
+                </span>
+                {% endif %}
+                <div class="phase-timer-display">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span id="phase-timer" class="time-value" data-remaining="{{ remaining_time|int }}">--:--</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div style="max-width: 900px; margin: 0 auto;">
+        <div
+            style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 2rem; box-shadow: var(--shadow-sm);">
+
+            <div style="margin-bottom: 1.5rem;">
+                <h2
+                    style="color: var(--deep-evergreen, #E11937); font-size: 1.4rem; font-weight: 700; margin-bottom: 0.25rem;">
+                    ✅ Prioritized by Votes</h2>
+                <p style="color: var(--text-muted, #666666); font-size: 0.95rem; margin: 0;">Ideas ranked by team votes
+                    — top picks highlighted below</p>
+            </div>
+
+            {% if data.idea_results %}
+            {% set sorted_ideas = data.idea_results %}
+
+            <!-- Top 3 Podium Section -->
+            {% if sorted_ideas|length >= 1 %}
+            <div class="podium-section">
+                <div class="podium-grid">
+                    {% for idea in sorted_ideas[:3] %}
+                    <div class="podium-card podium-rank-{{ loop.index }}">
+                        <div class="podium-medal">
+                            {% if loop.index == 1 %}
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="8" r="6" fill="#F59E0B" opacity="0.2" stroke="#F59E0B"
+                                    stroke-width="1.5" />
+                                <path d="M12 2l1.5 3.5L17 6l-2.5 2.5L15 12l-3-2-3 2 .5-3.5L7 6l3.5-.5L12 2z"
+                                    fill="#F59E0B" />
+                                <path d="M8 14l-2 8 6-3 6 3-2-8" stroke="#F59E0B" stroke-width="1.5" fill="#F59E0B"
+                                    opacity="0.15" />
+                            </svg>
+                            {% elif loop.index == 2 %}
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="8" r="6" fill="#94A3B8" opacity="0.2" stroke="#94A3B8"
+                                    stroke-width="1.5" />
+                                <path d="M12 2l1.5 3.5L17 6l-2.5 2.5L15 12l-3-2-3 2 .5-3.5L7 6l3.5-.5L12 2z"
+                                    fill="#94A3B8" />
+                                <path d="M8 14l-2 8 6-3 6 3-2-8" stroke="#94A3B8" stroke-width="1.5" fill="#94A3B8"
+                                    opacity="0.15" />
+                            </svg>
+                            {% elif loop.index == 3 %}
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="8" r="6" fill="#CD7F32" opacity="0.2" stroke="#CD7F32"
+                                    stroke-width="1.5" />
+                                <path d="M12 2l1.5 3.5L17 6l-2.5 2.5L15 12l-3-2-3 2 .5-3.5L7 6l3.5-.5L12 2z"
+                                    fill="#CD7F32" />
+                                <path d="M8 14l-2 8 6-3 6 3-2-8" stroke="#CD7F32" stroke-width="1.5" fill="#CD7F32"
+                                    opacity="0.15" />
+                            </svg>
+                            {% endif %}
+                        </div>
+                        <div class="podium-rank-badge rank-{{ loop.index }}">{{ loop.index }}</div>
+                        <p class="podium-text">{{ idea.normalized_content }}</p>
+                        <div class="podium-votes">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                </path>
+                            </svg>
+                            <span>{{ idea.vote_count }} vote{{ 's' if idea.vote_count != 1 else '' }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Remaining Ideas (4th onward) -->
+            {% if sorted_ideas|length > 3 %}
+            <div class="remaining-section">
+                <h3 class="remaining-heading">Other Ideas</h3>
+                <div class="remaining-list">
+                    {% for idea in sorted_ideas[3:] %}
+                    <div class="remaining-item">
+                        <span class="remaining-rank">{{ loop.index + 3 }}</span>
+                        <span class="remaining-text">{{ idea.normalized_content }}</span>
+                        <span class="remaining-votes">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                                </path>
+                            </svg>
+                            {{ idea.vote_count }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <div class="empty-state" style="text-align:center; padding: 3rem; color: var(--text-muted);">
+                <p>No ideas found for this problem.</p>
+            </div>
+            {% endif %}
+
+            <!-- Voter count -->
+            <div class="voter-count-badge">
+                <span style="font-size: 1.2rem;">👥</span>
+                <span>{{ data.total_voters }} voted</span>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const timerElement = document.getElementById('phase-timer');
+        let remainingSeconds = parseInt(timerElement.dataset.remaining);
+
+        function updateTimer() {
+            if (remainingSeconds > 0) {
+                remainingSeconds--;
+                const minutes = Math.floor(remainingSeconds / 60);
+                const seconds = remainingSeconds % 60;
+                timerElement.textContent = minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+            } else {
+                timerElement.textContent = '00:00';
+            }
+        }
+
+        if (remainingSeconds > 0) {
+            setInterval(updateTimer, 1000);
+        } else {
+            timerElement.textContent = '00:00';
+        }
+
+        // Animate podium cards on load
+        const podiumCards = document.querySelectorAll('.podium-card');
+        podiumCards.forEach((card, i) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 150 * (i + 1));
+        });
+    });
+</script>
+{% endblock %}

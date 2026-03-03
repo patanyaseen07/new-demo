@@ -1,0 +1,1011 @@
+/* ============================================
+   Dashboard Styles - Clean & Elegant
+   ============================================ */
+
+/* Layout */
+.dashboard-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    position: relative;
+}
+
+
+
+/* Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-content h1 {
+    margin-bottom: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--black-forest);
+}
+
+.header-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0.2rem 0 0 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+#normal-actions,
+.select-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+/* ============================================
+   Filter Tabs - Minimal
+   ============================================ */
+.filter-tabs {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 2rem;
+}
+
+.filter-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.875rem;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-tab:hover {
+    color: var(--primary-color);
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.filter-tab.active {
+    color: #1A1A1A;
+    background: rgba(0, 0, 0, 0.05);
+    font-weight: 700;
+}
+
+.filter-count {
+    padding: 0.125rem 0.375rem;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    min-width: 20px;
+    text-align: center;
+    color: var(--primary-color);
+}
+
+.filter-tab.active .filter-count {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.live-dot {
+    width: 6px;
+    height: 6px;
+    background: #22C55E;
+    border-radius: 50%;
+}
+
+/* ============================================
+   Buttons - Clean
+   ============================================ */
+.btn-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.875rem;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+}
+
+.btn-text:hover {
+    border-color: #D0D0D0;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    background: #E11937;
+    color: var(--cornsilk);
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.btn-primary:hover {
+    background: #C41230;
+}
+
+.btn-secondary {
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    border-color: #D0D0D0;
+}
+
+.btn-danger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+}
+
+.btn-danger:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.selection-info {
+    padding: 0.375rem 0.75rem;
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+/* ============================================
+   Problems Grid - Fixed Layout
+   ============================================ */
+.problems-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+@media (max-width: 1000px) {
+    .problems-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+    .problems-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   Problem Card - Elegant & Simple
+   ============================================ */
+.problem-card {
+    position: relative;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    cursor: default;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.problem-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: #D0D0D0;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+.problem-card.is-live {
+    border-left: 3px solid #E11937;
+}
+
+.problem-card.select-mode {
+    cursor: pointer;
+}
+
+.problem-card.selected {
+    border-color: #1A1A1A;
+    background: #F5F5F5;
+}
+
+/* Smooth hide instead of display:none */
+.problem-card.hidden {
+    display: none;
+}
+
+/* Selection Indicator */
+.select-indicator {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    background: var(--card-bg);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.problem-card.select-mode .select-indicator {
+    display: flex;
+}
+
+.problem-card.select-mode .delete-btn {
+    display: none;
+}
+
+.select-indicator svg {
+    opacity: 0;
+    color: white;
+}
+
+.problem-card.selected .select-indicator {
+    background: #E11937;
+    border-color: #E11937;
+}
+
+.problem-card.selected .select-indicator svg {
+    opacity: 1;
+}
+
+.hidden-checkbox {
+    display: none;
+}
+
+/* Card Header */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.card-tags {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.5rem;
+    background: #16a34a;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.live-pulse {
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+}
+
+.phase-tag {
+    display: inline-block;
+    /* Default: warm terracotta — app's accent color */
+    background: #E11937;
+    color: #FFFFFF;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+/* Light yellow for Phase 3 Results */
+.phase-result {
+    background: #E11937;
+    color: #FFFFFF;
+}
+
+/* Green for final result phases */
+.phase-idea_results {
+    background: #E11937;
+    color: #FFFFFF;
+}
+
+/* Icon Button */
+.icon-btn {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.problem-card:hover .icon-btn {
+    opacity: 1;
+}
+
+.icon-btn:hover {
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+}
+
+/* Card Content */
+.card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--black-forest);
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+}
+
+.card-description {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Time Remaining */
+.time-remaining {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+}
+
+.time-remaining svg {
+    width: 10px;
+    height: 10px;
+}
+
+.time-value {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Card Footer */
+.card-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-enter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 0.7rem;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.btn-enter:hover {
+    border-color: var(--olive-leaf);
+    color: var(--black-forest);
+}
+
+.btn-enter-live {
+    background: #E11937;
+    border-color: #E11937;
+    color: white;
+}
+
+.btn-enter-live:hover {
+    background: #C41230;
+    border-color: #C41230;
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted);
+}
+
+.empty-state svg {
+    margin-bottom: 1rem;
+    opacity: 0.25;
+}
+
+.empty-state h3 {
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+/* ============================================
+   Modals - Minimal
+   ============================================ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.25rem 1rem;
+}
+
+.modal-header h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-close {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.modal-close:hover {
+    color: var(--text-color);
+}
+
+.modal-content form {
+    padding: 0 1.25rem 1.25rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.375rem;
+    color: var(--text-color);
+}
+
+.form-group .optional {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.form-group input,
+.form-group textarea {
+    margin-bottom: 0;
+    font-size: 0.85rem;
+}
+
+.duration-input {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.duration-input input {
+    width: 80px;
+    margin-bottom: 0;
+}
+
+.duration-unit {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    padding-top: 0.75rem;
+}
+
+/* Confirm Modal */
+.modal-confirm {
+    text-align: center;
+    padding: 1.5rem;
+    max-width: 320px;
+}
+
+.confirm-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+.confirm-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.modal-confirm h3 {
+    font-size: 0.95rem;
+    margin-bottom: 0.375rem;
+}
+
+.modal-confirm p {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.4;
+}
+
+.modal-confirm .modal-actions {
+    justify-content: center;
+}
+
+/* ============================================
+   Detail Modal
+   ============================================ */
+.modal-detail {
+    max-width: 480px;
+    position: relative;
+}
+
+.modal-close-float {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    border-radius: 50%;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.modal-close-float:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--text-color);
+}
+
+.detail-header {
+    padding: 1.5rem 1.5rem 0;
+}
+
+.detail-tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.detail-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--black-forest);
+    margin: 0;
+    line-height: 1.3;
+    padding-right: 2rem;
+}
+
+.detail-body {
+    padding: 1.25rem 1.5rem;
+}
+
+.detail-description {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+}
+
+.detail-timer {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    background: #F5F5F5;
+    color: var(--text-color);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+}
+
+.detail-timer svg {
+    width: 14px;
+    height: 14px;
+}
+
+#detail-time-value {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.detail-meta {
+    display: flex;
+    gap: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.meta-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.meta-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.detail-footer {
+    padding: 1rem 1.5rem 1.5rem;
+}
+
+.btn-full {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+}
+
+.btn-full svg {
+    margin-left: 0.25rem;
+}
+
+/* ============================================
+   Fishbone Diagram - Classic Slanted Style
+   CSS-variable-driven geometry for easy tuning
+   ============================================ */
+
+/*  Fishbone geometry
+    ==================
+    SVG viewBox = 0 0 900 480.  All percentage positions below are
+    derived from that coordinate space so the HTML overlay always
+    matches the SVG lines, regardless of container size.
+
+    Top ribs  (x1,60 → x2,240):  People 140→200  |  Process 340→400  |  Environment 540→600
+    Bot ribs  (x1,420→ x2,240):  Technology 80→140 | Tools 280→340    |  Program 480→540
+    Spine: 40,240 → 720,240
+    Fish-head: starts at x≈720
+*/
+
+.fishbone-diagram {
+    --fb-cause-width: 140px;
+    --fb-arrow-size: 4px;
+    --fb-spine-color: #000000;
+    --fb-connector-color: #333;
+}
+
+.fishbone-wrapper {
+    overflow: visible;
+    padding: 2.5rem 2rem;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    min-height: 520px;
+}
+
+.fishbone-diagram {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    min-height: 480px;
+    height: auto;
+    margin: 0 auto;
+    /* Force the aspect ratio of the SVG viewBox (900:480) */
+    aspect-ratio: 900 / 480;
+}
+
+.fishbone-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Problem Head Box - right of spine arrow */
+.fish-head {
+    position: absolute;
+    /* spine ends at x=720 → 80%, vertically centred at y=240 → 50% */
+    top: 50%;
+    left: 80%;
+    transform: translateY(-50%);
+    width: 18%;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--fb-spine-color);
+    line-height: 1.35;
+    z-index: 10;
+    background: #fff;
+    border: 1.5px solid var(--fb-spine-color);
+    border-radius: 4px;
+    padding: 0.85rem 0.6rem;
+}
+
+/* Overlay Container for Categories - covers the area left of the fish-head */
+.overlay-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80%;
+    /* up to where the spine arrow ends */
+    height: 100%;
+    z-index: 5;
+}
+
+/* Category Groups */
+.category-group {
+    position: absolute;
+    width: 18%;
+    /* ~160px at 900-wide */
+}
+
+/* Category Labels */
+.cat-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--fb-spine-color);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 0.4rem;
+}
+
+.category-group.top .cat-label {
+    text-align: right;
+    padding-right: 0.9rem;
+}
+
+.category-group.bottom .cat-label {
+    text-align: left;
+    padding-left: 0.5rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+}
+
+/* ── Top categories ────────────────────────────
+   Each group sits above the spine (top 50%) aligned to its rib tip.
+   top: ~2%  (12.5% of viewBox = 60/480)
+   height: ~37.5%  (spine at 50% minus top)
+   Rib tip x-values → left %:  People 140/900≈15.5%, Process 340/900≈37.8%, Environment 540/900≈60%
+   We offset left by group-width so the right edge aligns with the rib.
+*/
+.category-group.top {
+    top: 2%;
+    height: 46%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* People (child 1):    rib tip x≈140 */
+.category-group.top:nth-child(1) {
+    left: 0%;
+}
+
+/* Process (child 2):   rib tip x≈340 */
+.category-group.top:nth-child(2) {
+    left: 24%;
+}
+
+/* Environment (child 3): rib tip x≈540 */
+.category-group.top:nth-child(3) {
+    left: 48%;
+}
+
+.category-group.top .cause-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: space-evenly;
+}
+
+/* ── Bottom categories ─────────────────────────
+   Below the spine (top 52%) down to rib tip y=420 → 87.5%.
+   Rib tip x-values: Technology 80/900≈8.9%, Tools 280/900≈31.1%, Program 480/900≈53.3%
+*/
+.category-group.bottom {
+    top: 52%;
+    height: 46%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Technology (child 4): rib tip x≈80 */
+.category-group.bottom:nth-child(4) {
+    left: 0%;
+}
+
+/* Tools (child 5):      rib tip x≈280 */
+.category-group.bottom:nth-child(5) {
+    left: 24%;
+}
+
+/* Program (child 6):    rib tip x≈480 */
+.category-group.bottom:nth-child(6) {
+    left: 48%;
+}
+
+.category-group.bottom .cause-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+/* Cause Row */
+.cause-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+    min-height: 1.6rem;
+    gap: 0;
+}
+
+/* Cause Text Box */
+.cause-text {
+    display: inline-block;
+    width: var(--fb-cause-width);
+    min-height: 24px;
+    font-size: 0.75rem;
+    color: var(--text-color);
+    background: #fff;
+    border: 1px solid var(--border-color);
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    font-weight: 500;
+    line-height: 1.3;
+    text-align: right;
+    box-shadow: var(--shadow-sm);
+    max-height: 3.2em;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+/* Connector line */
+.connector-line {
+    display: inline-flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+    margin-left: 0 !important;
+    pointer-events: none;
+    width: 30px;
+}
+
+.connector-line::before {
+    content: '' !important;
+    display: block !important;
+    flex: 1 !important;
+    height: 1.5px !important;
+    background-color: var(--fb-connector-color) !important;
+}
+
+.connector-line::after {
+    content: '' !important;
+    display: block !important;
+    width: 0 !important;
+    height: 0 !important;
+    flex-shrink: 0 !important;
+    border-top: var(--fb-arrow-size) solid transparent !important;
+    border-bottom: var(--fb-arrow-size) solid transparent !important;
+    border-left: 6px solid var(--fb-connector-color) !important;
+}

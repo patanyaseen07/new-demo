@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Load Dashboard CSS for consistent styling -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/phase_header.css') }}">
+
+<div class="dashboard-container">
+    <!-- Header Section -->
+    <header class="phase-header">
+        <div class="phase-header-left">
+            <a href="{{ url_for('dashboard') }}" class="phase-back-btn" title="Back to Dashboard">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div class="phase-header-info">
+                <h1>{{ problem.title }} <span class="phase-tag-inline phase-tag-collect">Phase 1</span></h1>
+                <p class="phase-subtitle">Collection Phase - Submit as many potential causes as you can</p>
+            </div>
+        </div>
+
+        <div class="phase-header-right">
+            <!-- Timer Section -->
+            <div class="phase-timer-section">
+                {% if problem.is_live %}
+                <span class="phase-live-badge">
+                    <span class="phase-live-pulse"></span>
+                    LIVE
+                </span>
+                {% endif %}
+                <div class="phase-timer-display">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span id="phase-timer" class="time-value" data-unique="timer"
+                        data-remaining="{{ remaining_time|int }}">--:--</span>
+                </div>
+                {% if is_session_creator %}
+                <button id="add-time-btn" class="phase-btn-add-time" onclick="addMoreTime()" title="Add 10 minutes">
+                    +10 min
+                </button>
+                {% endif %}
+            </div>
+
+            <!-- Admin: Next Phase Button -->
+            {% if is_session_creator %}
+            <form action="{{ url_for('start_phase') }}" method="POST" class="phase-next-form"
+                onsubmit="this.querySelector('button').disabled=true; this.querySelector('button').innerText='Processing...';">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="problem_id" value="{{ problem.id }}">
+                <input type="hidden" name="next_phase" value="aggregate">
+                <button type="submit" class="phase-btn-next">
+                    Next: Aggregate
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </header>
+
+
+    <div class="grid-2">
+        <!-- Input Section -->
+        <div class="card" style="border: 1px solid var(--border-color); border-radius: 12px; height: auto;">
+            <h3 style="color: var(--black-forest); font-weight: 700;">Submit a Cause</h3>
+            <p class="text-muted" style="font-size: 0.9rem;">What went wrong? Be specific.</p>
+            <textarea id="cause-input" rows="4" class="form-control"
+                style="width: 100%; border-radius: 8px; border: 1px solid var(--border-color); padding: 0.75rem;"
+                placeholder="e.g. Database connection pool was exhausted because the timeout configuration was too high..."></textarea>
+            <button id="submit-cause"
+                class="btn-primary btn-full mt-4 {% if problem.is_live %}btn-enter-live{% endif %}"
+                style="width: 100%;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+                Analyze & Submit
+            </button>
+            <div id="status-msg" class="mt-4 text-center text-muted" style="font-size: 0.85rem; height: 1.2em;"></div>
+        </div>
+
+        <!-- My Submissions -->
+        <div class="card" style="border: 1px solid var(--border-color); border-radius: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="color: var(--black-forest); font-weight: 700; margin: 0;">My Submissions</h3>
+                <span class="selection-info">{{ data.my_feedback|length }} items</span>
+            </div>
+            <div id="my-list" style="margin-top:1rem; max-height:400px; overflow-y:auto; padding-right: 0.5rem;">
+                {% for f in data.my_feedback %}
+                <div class="cause-item"
+                    style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 0.75rem; border-radius: 8px; margin-bottom: 0.5rem;">
+                    <div style="font-weight: 500; font-size: 0.95rem; margin-bottom: 0.25rem;">{{ f.normalized_content
+                        }}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">{{ f.raw_content|truncate(30)
+                            }}</span>
+                        <span
+                            style="font-size:0.7rem; background: var(--sunlit-clay); color: var(--black-forest); padding: 0.1rem 0.5rem; border-radius: 4px; font-weight: 600;">{{
+                            f.category }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% if not data.my_feedback %}
+                <div class="empty-state" style="padding: 2rem 0;">
+                    <p>No causes submitted yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Dashboard Container -->
+
+<script>
+    window.FISHBONE_CONFIG = {
+        problemId: "{{ problem.id }}",
+        isAdmin: JSON.parse("{{ 'true' if is_session_creator else 'false' }}"),
+        urls: {
+            startPhase: "{{ url_for('start_phase') }}",
+            extendTime: "{{ url_for('extend_time') }}",
+            submitFeedback: "{{ url_for('submit_feedback') }}",
+            status: "{{ url_for('problem_status', problem_id=problem.id) }}"
+        }
+    };
+</script>
+<script src="{{ url_for('static', filename='js/collect.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Phase: Refined Problem Statement{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/phase_restate_problem.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- Use standard dashboard layout -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/phase_header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/phase_restate_problem.css') }}">
+
+<div class="dashboard-container">
+    <!-- Header -->
+    <header class="phase-header">
+        <div class="phase-header-left">
+            <a href="{{ url_for('dashboard') }}" class="phase-back-btn" title="Back to Dashboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div class="phase-header-info">
+                <h1>{{ problem.title }} <span class="phase-tag-inline phase-tag-deep-dive">Phase 6</span></h1>
+                <p class="phase-subtitle">Restate Problem - Connecting the root cause to the original problem</p>
+            </div>
+        </div>
+        <div class="phase-header-right">
+            {% if is_session_creator %}
+            <form action="{{ url_for('start_phase') }}" method="POST" id="next-phase-form" class="phase-next-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="problem_id" value="{{ problem.id }}">
+                <input type="hidden" name="next_phase" value="final_statement_display">
+                <button type="submit" class="phase-btn-next" id="next-phase-btn" {% if not
+                    problem.refined_problem_statement %}disabled{% endif %}>
+                    Next: Final Statement
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="phase-restate-problem-content" style="padding-top: 1rem;">
+
+        {% if is_session_creator %}
+        <!-- ============ ADMIN VIEW ============ -->
+        <div class="admin-view">
+
+            <!-- Step 1: Most Voted Statement -->
+            <div class="card step-card">
+                <div class="step-header">
+                    <span class="step-number">1</span>
+                    <h2>Most Voted Root Cause</h2>
+                </div>
+                <div class="statement-display original">
+                    <p id="most-voted-text">{{ most_voted_statement or 'No votes recorded — using first available root cause answer.' }}</p>
+                    <span class="vote-count" id="vote-count">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
+                            </path>
+                        </svg>
+                        {{ vote_count or 0 }} votes
+                    </span>
+                </div>
+            </div>
+
+            <!-- Step 2: AI Refinement -->
+            <div class="card step-card">
+                <div class="step-header">
+                    <span class="step-number">2</span>
+                    <h2>AI-Refined Problem Statement</h2>
+                </div>
+
+                <!-- LLM Error Banner (shown by JS when AI fails) -->
+                <div id="llm-error-banner" class="llm-error-banner" style="display:none;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <div>
+                        <strong>AI refinement failed.</strong> Please type the problem statement manually below, then click <strong>Save &amp; Share</strong> to continue.
+                    </div>
+                </div>
+
+                {% if problem.refined_problem_statement %}
+                <!-- Already refined -->
+                <div class="refined-section" id="refined-section">
+                    <textarea id="refined-statement"
+                        class="refined-textarea">{{ problem.refined_problem_statement }}</textarea>
+                    <div class="refined-actions">
+                        <button id="regenerate-btn" class="btn-outline">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                            </svg>
+                            Regenerate
+                        </button>
+                        <button id="save-btn" class="btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Not yet refined -->
+                <div class="refine-section" id="refine-section">
+                    <p class="hint-text">Click below to generate an AI-refined version of the problem statement.</p>
+                    <button id="refine-btn" class="btn-primary btn-large">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        </svg>
+                        Refine with AI
+                    </button>
+                </div>
+                <div class="refined-section" id="refined-section" style="display: none;">
+                    <textarea id="refined-statement" class="refined-textarea"
+                        placeholder="Refined statement will appear here..."></textarea>
+                    <div class="refined-actions">
+                        <button id="regenerate-btn" class="btn-outline">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                            </svg>
+                            Regenerate
+                        </button>
+                        <button id="save-btn" class="btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Loading State -->
+                <div id="loading-state" class="loading-state" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>AI is refining the problem statement...</p>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- ============ USER VIEW ============ -->
+            <div class="user-view">
+                <div class="card result-card">
+                    <div class="result-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h2>Refined Problem Statement</h2>
+
+                    <div class="refined-result">
+                        <div class="waiting-state">
+                            <p>Waiting for the facilitator to share the refined statement...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+    </main>
+
+    <!-- Error Toast -->
+    <div id="error-toast" class="toast error-toast" style="display: none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span id="error-message">An error occurred</span>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="success-toast" class="toast success-toast" style="display: none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <span id="success-message">Saved successfully</span>
+    </div>
+</div>
+
+<!-- Config Data -->
+<div id="config-data" data-problem-id="{{ problem.id }}"
+    data-is-admin="{{ 'true' if is_session_creator else 'false' }}" data-url-extend="{{ url_for('extend_time') }}"
+    data-url-refine="{{ url_for('refine_statement_api') }}" data-url-save="{{ url_for('save_refined_statement_api') }}"
+    data-url-status="{{ url_for('problem_status', problem_id=problem.id) }}"
+    data-remaining-time="{{ remaining_time|int }}" data-most-voted="{{ most_voted_statement or '' }}"
+    data-url-transition-phase="{{ url_for('transition_phase', problem_id=problem.id) }}" style="display:none;"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/phase_restate_problem.js') }}"></script>
+{% endblock %}

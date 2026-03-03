@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Results by Votes{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/results_by_votes.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <header class="page-header">
+        <h1> 📊 Phase 3 Results</h1>
+        <p class="subtitle">causes ranked by community votes</p>
+    </header>
+
+    <!-- Loading State -->
+    <div id="loading" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading results...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-container" class="error-message hidden">
+        <p><span id="error-text">Error loading results.</span></p>
+        <button onclick="retryFetch()" class="btn-retry">Retry</button>
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-container" class="empty-state hidden">
+        <p>No results available yet.</p>
+        <p class="empty-hint">Ideas will appear here after voting is complete.</p>
+    </div>
+
+    <!-- Results -->
+    <div id="results-container" class="results-grid hidden"></div>
+
+    <!-- Navigation -->
+    <div class="navigation-buttons">
+        <a href="{{ url_for('results_page', problem_id=problem.id) }}" class="btn btn-secondary">
+            View Results
+        </a>
+        <div class="participants-count">
+            <span style="font-size: 1.1rem;">👥</span> <strong>{{ participants_count }}</strong> voted
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/results_by_votes.js') }}"></script>
+{% endblock %}

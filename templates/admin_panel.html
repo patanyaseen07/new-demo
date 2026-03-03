@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+
+<div class="admin-container">
+
+    <header class="admin-header">
+        <div>
+            <div class="admin-breadcrumb">
+                <a href="{{ url_for('dashboard') }}" class="breadcrumb-link">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 5l-7 7 7 7"></path>
+                    </svg>
+                    Dashboard
+                </a>
+            </div>
+            <h1>Admin Panel</h1>
+            <p>Database tables — browse, search, delete, and export records</p>
+        </div>
+    </header>
+
+    <!-- Overview Stats -->
+    <div class="overview-stats">
+        <div class="overview-stat">
+            <div class="o-icon o-icon-green">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"></path>
+                </svg>
+            </div>
+            <div>
+                <div class="o-value">{{ overview.user_count }}</div>
+                <div class="o-label">Regular Users</div>
+            </div>
+        </div>
+        <div class="overview-stat">
+            <div class="o-icon o-icon-terra">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+            </div>
+            <div>
+                <div class="o-value">{{ overview.admin_count }}</div>
+                <div class="o-label">Admins</div>
+            </div>
+        </div>
+        <div class="overview-stat">
+            <div class="o-icon o-icon-blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </div>
+            <div>
+                <div class="o-value">{{ overview.active_problems }}</div>
+                <div class="o-label">Active Sessions</div>
+            </div>
+        </div>
+        <div class="overview-stat">
+            <div class="o-icon o-icon-purple">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+            <div>
+                <div class="o-value">{{ overview.total_activity }}</div>
+                <div class="o-label">Total Activity</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DB Tables Grid -->
+    <h2 class="section-title">Database Tables</h2>
+    <div class="db-tables-grid">
+        {% for name, label in table_labels.items() %}
+        <a href="{{ url_for('admin_table_view', table_name=name) }}" class="db-table-card">
+            <div class="db-table-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                    <path d="M3 9h18M3 15h18M9 3v18"></path>
+                </svg>
+            </div>
+            <div class="db-table-info">
+                <div class="db-table-name">{{ label }}</div>
+                <div class="db-table-meta">{{ name }}</div>
+            </div>
+            <div class="db-table-count">{{ table_counts[name] }}</div>
+            <svg class="db-table-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"></path>
+            </svg>
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Recent Activity Split -->
+    <div class="recent-grid">
+
+        <!-- Recent Problems -->
+        <div class="recent-card">
+            <div class="recent-card-header">
+                <h3>Recent Problems</h3>
+                <a href="{{ url_for('admin_table_view', table_name='problems') }}" class="view-all-link">View all →</a>
+            </div>
+            {% if recent_problems %}
+            <ul class="recent-list">
+                {% for p in recent_problems %}
+                <li class="recent-item">
+                    <a href="{{ url_for('admin_problem_detail', problem_id=p.id) }}" class="recent-item-link">
+                        <div class="recent-item-main">
+                            <span class="recent-item-title">{{ p.title }}</span>
+                            <span class="phase-badge">{{ p.current_phase | phase_display }}</span>
+                        </div>
+                        <div class="recent-item-meta">{{ p.created_at }}</div>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="pp-empty" style="padding:1rem;">No problems yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Recent Users -->
+        <div class="recent-card">
+            <div class="recent-card-header">
+                <h3>Recent Users</h3>
+                <a href="{{ url_for('admin_table_view', table_name='users') }}" class="view-all-link">View all →</a>
+            </div>
+            {% if recent_users %}
+            <ul class="recent-list">
+                {% for u in recent_users %}
+                <li class="recent-item">
+                    <a href="{{ url_for('admin_user_detail', user_id=u.id) }}" class="recent-item-link">
+                        <div class="recent-item-main">
+                            <span class="user-avatar" style="width:28px; height:28px; font-size:0.85rem; flex-shrink:0;">{{ u.email[0]|upper }}</span>
+                            <span class="recent-item-title">{{ u.email }}</span>
+                            <span class="role-badge {{ u.role }}" style="font-size:0.65rem;">{{ 'Administrator' if u.role == 'admin' else 'Member' }}</span>
+                        </div>
+                        <div class="recent-item-meta">Joined {{ u.created_at }}</div>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="pp-empty" style="padding:1rem;">No users yet.</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

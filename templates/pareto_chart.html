@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Pareto Chart - {{ problem.title }}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pareto_chart.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2/dist/chartjs-plugin-annotation.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/phase_header.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pareto_chart.css') }}">
+
+<div class="dashboard-container">
+    <!-- Header -->
+    <header class="phase-header">
+        <div class="phase-header-left">
+            <a href="{{ url_for('dashboard') }}" class="phase-back-btn" title="Back to Dashboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div class="phase-header-info">
+                <h1>{{ problem.title }} <span class="phase-tag-inline phase-tag-similar-whys">Phase 5</span></h1>
+                {% if problem.current_phase == 'pareto_view' %}
+                <p class="phase-subtitle">Analyze the voting results to identify the most critical causes.</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="phase-header-right">
+            <div class="phase-timer-section">
+                {% if problem.is_live %}
+                <span class="phase-live-badge">
+                    <span class="phase-live-pulse"></span>
+                    LIVE
+                </span>
+                {% endif %}
+                <div class="phase-timer-display">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span id="phase-timer" class="time-value">--:--</span>
+                </div>
+            </div>
+            {% if is_session_creator %}
+            <button id="add-time-btn" class="phase-btn-add-time">+ 10 min</button>
+            {% if problem.current_phase == 'pareto_view' %}
+            <form action="{{ url_for('start_phase') }}" method="POST" class="phase-next-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="problem_id" value="{{ problem.id }}">
+                <input type="hidden" name="next_phase" value="restate_problem">
+                <button type="submit" class="phase-btn-next">
+                    Next: Restate Problem
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </form>
+            {% else %}
+            <!-- This block handles other phases, but for pareto_chart.html, we primarily care about 'pareto_view' -->
+            <!-- If for some reason an admin is on this page in a different phase, this will advance it -->
+            <form action="{{ url_for('start_phase') }}" method="POST" class="phase-next-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="problem_id" value="{{ problem.id }}">
+                <input type="hidden" name="next_phase" value="restate_problem"> {# Default to restate_problem if not
+                pareto_view #}
+                <button type="submit" class="phase-btn-next">
+                    Next: Restate Problem
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </form>
+            {% endif %}
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Chart Section -->
+    <div class="chart-card">
+        <div class="card-header">
+            <h2>Vote Distribution</h2>
+            <span class="total-votes">Total Votes: <strong id="total-votes">0</strong></span>
+        </div>
+        <div class="chart-wrapper">
+            <canvas id="paretoChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-card">
+        <div class="card-header">
+            <h2>Detailed Results</h2>
+            <button id="export-btn" class="btn-icon" title="Export Data">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+            </button>
+        </div>
+        {% if pareto_data %}
+        <div class="table-wrapper">
+            <table class="data-table" id="pareto-table">
+                <thead>
+                    <tr>
+                        <th class="rank-col">#</th>
+                        <th>Cause</th>
+                        <th class="num-col">Votes</th>
+                        <th class="num-col">%</th>
+                        <th class="num-col">Cumulative %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in pareto_data %}
+                    <tr data-votes="{{ item.vote_count }}" data-cumulative="{{ item.cumulative_percentage }}">
+                        <td class="rank-col">{{ loop.index }}</td>
+                        <td>{{ item.why_text }}</td>
+                        <td class="num-col">{{ item.vote_count }}</td>
+                        <td class="num-col">{{ item.percentage }}%</td>
+                        <td class="num-col">
+                            <div class="cumulative-bar">
+                                <div class="bar-fill" style="width: {{ item.cumulative_percentage }}%"></div>
+                                <span>{{ item.cumulative_percentage }}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="no-data">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path
+                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                </path>
+            </svg>
+            <p>No voting data available yet.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Footer Actions (Participant Count Only) -->
+    <div class="actions" style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+        <div class="action-info">
+            <span class="participants-count">
+                <span style="font-size: 1.1rem;">👥</span>
+                <span id="participant-count">{{ participants|default(0) }}</span> voted
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Config Data -->
+<div id="config-data" data-problem-id="{{ problem.id }}"
+    data-is-admin="{{ 'true' if is_session_creator else 'false' }}" data-url-extend="{{ url_for('extend_time') }}"
+    data-remaining-time="{{ remaining_time|int }}" data-pareto-data='{{ pareto_data | tojson | safe }}'
+    data-url-status="{{ url_for('problem_status', problem_id=problem.id) }}" style="display:none;"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/pareto_chart.js') }}"></script>
+{% endblock %}
